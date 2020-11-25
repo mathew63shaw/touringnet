@@ -26,7 +26,7 @@ $events_circuits_sql = "SELECT e.event_id, e.round, e.date, e.circuit, e.`race_i
                         FROM (SELECT * FROM `event` WHERE `year`='" . $year . "' AND `series`='" . $series . "') e
                         LEFT JOIN circuits c
                         ON e.circuit = c.configuration
-                        ORDER BY e.round+0, e.date";
+                        ORDER BY e.date, e.round+0";
 $events_circuits_query_result = mysqli_query($conn, $events_circuits_sql);
 while ($row = mysqli_fetch_assoc($events_circuits_query_result)) {
     $events_circuits_data[$row['event_id']][] = [$row['round'], $row['date'], $row['circuit'], $row['race_id'], $row['qual_id'], $row['graphic_path']];
@@ -154,16 +154,31 @@ while ($row = mysqli_fetch_assoc($footer_query_result)) {
 </head>
 <style>
     .custom-card {
-        border: solid 2px #f1545a;
-        border-radius: 10px;
+        /* border: solid 2px #f1545a;
+        border-radius: 10px; */
+        box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
         padding: 10px;
         margin-bottom: 10px;
     }
 
     .custom-footer {
-        border: solid 1px grey;
+        border: solid 1px #ededed;
         margin: 10px;
-        padding: 10px;
+        padding: 20px;
+    }
+
+    .custom-list {
+        margin-left: 12px;
+        display: flex;
+        justify-content: space-between;
+    }
+
+    .pos {
+        padding-right: 10px;
+    }
+
+    .custom-sidebar {
+        box-shadow: 10px 8px 10px #f2f2f2;
     }
 </style>
 
@@ -193,11 +208,13 @@ while ($row = mysqli_fetch_assoc($footer_query_result)) {
                 <div class="td-post-content">
 
                     <?php
+                    $i = 0;
                     foreach ($events_circuits_data as $key => $values) {
                         // Making rounds
                         $rounds = 'Rounds ';
                         $length = count($values);
                         if ($length == 1) {
+                            $rounds = 'Round ';
                             $rounds .= $values[0][0];
                         } else if ($length == 2) {
                             $rounds .= $values[0][0] . ' and ' . $values[1][0];
@@ -212,14 +229,24 @@ while ($row = mysqli_fetch_assoc($footer_query_result)) {
                         $to = $values[$length - 1][1];
                     ?>
 
-                        <div class="td-pb-span6" style="padding-left: 10px; padding-right: 10px">
+
+                        <div class="td-pb-span6" style="padding-left: <?php echo ($i == 1 ? "9px" : "10px"); ?>; padding-right: <?php echo ($i == 1 ? "9px" : "10px"); ?>">
+
                             <div class="custom-card">
                                 <img src="<?php $_SERVER['DOCUMENT_ROOT']; ?><?php echo $values[0][5]; ?>" title="<?php $values[0][2]; ?>" style="width: auto; height: auto;" />
                                 <p>
                                     <b><?php echo $rounds; ?></b>
                                     <br /><br />
 
-                                    <em><?php echo $from; ?> - <?php echo $to; ?></em>
+                                    <em>
+                                        <?php
+                                        if ($from == $to) {
+                                            echo $from;
+                                        } else {
+                                            echo $from . ' - ' . $to;
+                                        }
+                                        ?>
+                                    </em>
                                     <br /><br />
 
                                     <a href='qual<?php echo $values[0][4]; ?>.php'>
@@ -241,42 +268,72 @@ while ($row = mysqli_fetch_assoc($footer_query_result)) {
                                 </p>
                             </div>
                         </div>
-
-                    <?php } ?>
+                    <?php $i++;
+                    } ?>
 
                 </div>
             </div>
         </div>
 
-        <div class="td-pb-span4 td-main-sidebar td-pb-border-top" role="complementary">
+        <div class="td-pb-span4 td-main-sidebar td-pb-border-top" style="padding-right: 40px; margin-top: 21px; padding-bottom: 16px;" role="complementary">
             <div class="td-ss-main-sidebar">
-                <aside class="widget widget_meta">
+                <aside class="widget widget_meta custom-sidebar">
                     <div class="block-title">
                         <span>Top 10 Drivers</span>
                     </div>
 
-                    <ul>
-                        <li>
-                            <?php include $_SERVER['DOCUMENT_ROOT'] . '/results/2020/modules/pointsbtcc.php'; ?>
-                        </li>
-                    </ul>
+                    <?php
+                    for ($i = 0; $i < count($top_ten_drivers); $i++) { ?>
+                        <div class="table-row" style="margin-bottom: 10px;">
+                            <div class="custom-list">
+                                <div>
+                                    <b><?php echo $top_ten_drivers[$i]['rank']; ?></b>
+                                    &nbsp;&nbsp;<img src="<?php $_SERVER['DOCUMENT_ROOT']; ?>/results/flag/<?php echo $top_ten_drivers[$i]['image']; ?>.gif" title="<?php echo $top_ten_drivers[$i]['country']; ?>">
+                                    &nbsp;<?php echo $top_ten_drivers[$i]['driver']; ?>
+                                </div>
+                                <div class="pos"><?php echo $top_ten_drivers[$i]['points']; ?></div>
+                            </div>
+                            <?php if ($i == 0 && !empty($top_ten_drivers[$i]['profile'])) { ?>
+                                <div class='car'><img src='<?php $_SERVER['DOCUMENT_ROOT']; ?>/<?php echo $top_ten_drivers[$i]['profile']; ?>' /></div>
+                            <?php } ?>
+                        </div>
+                        <hr>
+                    <?php }
+                    ?>
+
+                    <div class="table-row" style="margin-bottom: 10px;">
+                        <div class='standings-topten'><b><a href='<?php echo get_option('home'); ?>/database/standings.php?series=<?php echo $series; ?>&year=<?php echo $year; ?>'>Championship Standings</a></b></div>
+                    </div>
+
                 </aside>
 
                 <?php dynamic_sidebar('HomeS1'); ?>
             </div>
 
             <div class="td-ss-main-sidebar">
-                <aside class="widget widget_meta">
+                <aside class="widget widget_meta custom-sidebar">
                     <div class="block-title">
                         <span>Driver with most wins</span>
                     </div>
 
                     <?php
                     for ($i = 0; $i < count($most_wins_drivers); $i++) { ?>
-                        <div class="table-row" style="margin-bottom: 5px;">
-                            <div class='pos'><b>Wins :</b> &nbsp;<?php echo $most_wins_drivers[$i]['Wins']; ?></div>
-                            <div class='driver'><img src="<?php $_SERVER['DOCUMENT_ROOT']; ?>/results/flag/<?php echo $most_wins_drivers[$i]['image']; ?>.gif">&nbsp;<b><?php echo $most_wins_drivers[$i]['driver']; ?></b></div>
+                        <div class="table-row" style="margin-bottom: 10px;">
+                            <div class="custom-list">
+                                <div>
+                                    <img src="<?php $_SERVER['DOCUMENT_ROOT']; ?>/results/flag/<?php echo $most_wins_drivers[$i]['image']; ?>.gif">
+                                    &nbsp;<?php echo $most_wins_drivers[$i]['driver']; ?>
+                                </div>
+                                <div class='pos'>
+                                    Wins:&nbsp;<?php echo $most_wins_drivers[$i]['Wins']; ?>
+                                </div>
+                            </div>
                         </div>
+                        <?php
+                        if (count($most_wins_drivers) > 1) { ?>
+                            <hr>
+                        <?php }
+                        ?>
                     <?php }
                     ?>
                 </aside>
@@ -285,17 +342,29 @@ while ($row = mysqli_fetch_assoc($footer_query_result)) {
             </div>
 
             <div class="td-ss-main-sidebar">
-                <aside class="widget widget_meta">
+                <aside class="widget widget_meta custom-sidebar">
                     <div class="block-title">
                         <span>Driver with most podiums</span>
                     </div>
 
                     <?php
                     for ($i = 0; $i < count($most_podiums_data); $i++) { ?>
-                        <div class="table-row" style="margin-bottom: 5px;">
-                            <div class='pos'><b>Podiums :</b> &nbsp;<?php echo $most_podiums_data[$i]['Podiums']; ?></div>
-                            <div class='driver'><img src="<?php $_SERVER['DOCUMENT_ROOT']; ?>/results/flag/<?php echo $most_podiums_data[$i]['image']; ?>.gif">&nbsp;<b><?php echo $most_podiums_data[$i]['driver']; ?></b></div>
+                        <div class="table-row" style="margin-bottom: 10px;">
+                            <div class='custom-list'>
+                                <div>
+                                    <img src="<?php $_SERVER['DOCUMENT_ROOT']; ?>/results/flag/<?php echo $most_podiums_data[$i]['image']; ?>.gif">
+                                    &nbsp;<?php echo $most_podiums_data[$i]['driver']; ?>
+                                </div>
+                                <div class='pos'>
+                                    Podiums:&nbsp;<?php echo $most_podiums_data[$i]['Podiums']; ?>
+                                </div>
+                            </div>
                         </div>
+                        <?php
+                        if (count($most_podiums_data) > 1) { ?>
+                            <hr>
+                        <?php }
+                        ?>
                     <?php }
                     ?>
                 </aside>
@@ -304,17 +373,29 @@ while ($row = mysqli_fetch_assoc($footer_query_result)) {
             </div>
 
             <div class="td-ss-main-sidebar">
-                <aside class="widget widget_meta">
+                <aside class="widget widget_meta custom-sidebar">
                     <div class="block-title">
                         <span>Driver with most pole positions</span>
                     </div>
 
                     <?php
                     for ($i = 0; $i < count($most_pole_data); $i++) { ?>
-                        <div class="table-row" style="margin-bottom: 5px;">
-                            <div class='pos'><b>Pole :</b> &nbsp;<?php echo $most_pole_data[$i]['Poles']; ?></div>
-                            <div class='driver'><img src="<?php $_SERVER['DOCUMENT_ROOT']; ?>/results/flag/<?php echo $most_pole_data[$i]['image']; ?>.gif">&nbsp;<b><?php echo $most_pole_data[$i]['driver']; ?></b></div>
+                        <div class="table-row" style="margin-bottom: 10px;">
+                            <div class='custom-list'>
+                                <div>
+                                    <img src="<?php $_SERVER['DOCUMENT_ROOT']; ?>/results/flag/<?php echo $most_pole_data[$i]['image']; ?>.gif">
+                                    &nbsp;<?php echo $most_pole_data[$i]['driver']; ?>
+                                </div>
+                                <div class='pos'>
+                                    Pole:&nbsp;<?php echo $most_pole_data[$i]['Poles']; ?>
+                                </div>
+                            </div>
                         </div>
+                        <?php
+                        if (count($most_pole_data) > 1) { ?>
+                            <hr>
+                        <?php }
+                        ?>
                     <?php }
                     ?>
                 </aside>
@@ -323,17 +404,29 @@ while ($row = mysqli_fetch_assoc($footer_query_result)) {
             </div>
 
             <div class="td-ss-main-sidebar">
-                <aside class="widget widget_meta">
+                <aside class="widget widget_meta custom-sidebar">
                     <div class="block-title">
                         <span>Driver with most fastest laps</span>
                     </div>
 
                     <?php
                     for ($i = 0; $i < count($most_fastest_data); $i++) { ?>
-                        <div class="table-row" style="margin-bottom: 5px;">
-                            <div class='pos'><b>Fastest :</b> &nbsp;<?php echo $most_fastest_data[$i]['FastestLaps']; ?></div>
-                            <div class='driver'><img src="<?php $_SERVER['DOCUMENT_ROOT']; ?>/results/flag/<?php echo $most_fastest_data[$i]['image']; ?>.gif">&nbsp;<b><?php echo $most_fastest_data[$i]['driver']; ?></b></div>
+                        <div class="table-row" style="margin-bottom: 10px;">
+                            <div class='custom-list'>
+                                <div>
+                                    <img src="<?php $_SERVER['DOCUMENT_ROOT']; ?>/results/flag/<?php echo $most_fastest_data[$i]['image']; ?>.gif">
+                                    &nbsp;<?php echo $most_fastest_data[$i]['driver']; ?>
+                                </div>
+                                <div class='pos'>
+                                    Fastest:&nbsp;<?php echo $most_fastest_data[$i]['FastestLaps']; ?>
+                                </div>
+                            </div>
                         </div>
+                        <?php
+                        if (count($most_fastest_data) > 1) { ?>
+                            <hr>
+                        <?php }
+                        ?>
                     <?php }
                     ?>
                 </aside>
@@ -346,10 +439,10 @@ while ($row = mysqli_fetch_assoc($footer_query_result)) {
     <div class="td-pb-row">
         <div class="td-pb-span12">
             <div class="custom-footer">
-                <div class="block-title">
+                <div class="block-title" style="margin-bottom: 0px;">
                     <span>Browse results by person</span>
                 </div>
-                <div class="td-post-content">
+                <div class="td-post-content" style="margin-top: 0px;">
                     <?php
                     $i = 0;
                     foreach ($footer_data as $key => $values) {
