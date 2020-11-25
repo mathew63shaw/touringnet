@@ -100,17 +100,38 @@ while ($row = mysqli_fetch_assoc($most_wins_drivers_query_result)) {
 /**
  * Get driver with most podiums
  */
-
+$most_podiums_data = [];
+$most_podiums_sql = "SELECT *
+                    FROM (SELECT races.driver, drivers.image,SUM(CASE WHEN races.year='2001' AND races.class_pos IN ('1', '2', '3') AND races.class='' THEN 1 ELSE 0 END)+SUM(CASE WHEN races.year!='2001' AND races.result IN ('1', '2', '3') AND races.class != 'P' THEN 1 ELSE 0 END) AS Podiums, COUNT(races.driver) AS Races, ROUND(((SUM(CASE WHEN races.year='2001' AND races.class_pos IN ('1', '2', '3') AND races.class='' THEN 1 ELSE 0 END)+SUM(CASE WHEN races.year!='2001' AND races.result IN ('1', '2', '3') AND races.class != 'P' THEN 1 ELSE 0 END)) / COUNT(races.driver))*100,1) AS Percent FROM `drivers` INNER JOIN races ON drivers.id = races.driver_id WHERE `Series` IN ('".$series."') AND YEAR ='".$year."' GROUP BY races.driver HAVING Podiums > 0 ORDER BY 3 DESC) temp
+                    WHERE temp.Podiums=(SELECT MAX(ff.Podiums) FROM (SELECT races.driver, drivers.image,SUM(CASE WHEN races.year='2001' AND races.class_pos IN ('1', '2', '3') AND races.class='' THEN 1 ELSE 0 END)+SUM(CASE WHEN races.year!='2001' AND races.result IN ('1', '2', '3') AND races.class != 'P' THEN 1 ELSE 0 END) AS Podiums, COUNT(races.driver) AS Races, ROUND(((SUM(CASE WHEN races.year='2001' AND races.class_pos IN ('1', '2', '3') AND races.class='' THEN 1 ELSE 0 END)+SUM(CASE WHEN races.year!='2001' AND races.result IN ('1', '2', '3') AND races.class != 'P' THEN 1 ELSE 0 END)) / COUNT(races.driver))*100,1) AS Percent FROM `drivers` INNER JOIN races ON drivers.id = races.driver_id WHERE `Series` IN ('".$series."') AND YEAR ='".$year."' GROUP BY races.driver HAVING Podiums > 0 ORDER BY 3 DESC) ff)";
+$most_podiums_query_result = mysqli_query($conn, $most_podiums_sql);
+while ($row = mysqli_fetch_assoc($most_podiums_query_result)) {
+    $most_podiums_data[] = $row;
+}
 
 /**
  * Get driver with most pole positions
  */
-
+$most_pole_data = [];
+$most_pole_sql = "SELECT *
+                FROM (SELECT q.`driver`, d.image, SUM(CASE WHEN q.result='1' THEN 1 ELSE 0 END) AS Poles FROM `qualifying` q, drivers d WHERE q.series IN ('".$series."') AND q.`year` = '".$year."' AND q.topq='Y' AND d.id=q.driver_id GROUP BY q.driver HAVING poles > 0 ORDER BY 2 DESC) temp
+                WHERE temp.Poles=(SELECT MAX(ff.Poles) FROM (SELECT q.`driver`, d.image, SUM(CASE WHEN q.result='1' THEN 1 ELSE 0 END) AS Poles FROM `qualifying` q, drivers d WHERE q.series IN ('".$series."') AND q.`year` = '".$year."' AND q.topq='Y' AND d.id=q.driver_id GROUP BY q.driver HAVING poles > 0 ORDER BY 2 DESC) ff)";
+$most_pole_query_result = mysqli_query($conn, $most_pole_sql);
+while ($row = mysqli_fetch_assoc($most_pole_query_result)) {
+    $most_pole_data[] = $row;
+}
 
 /**
  * Get driver with most fastest laps
  */
-
+$most_fastest_data = [];
+$most_fastest_sql = "SELECT *
+                    FROM (SELECT r.driver, d.image, SUM(CASE WHEN r.fl='Y' THEN 1 ELSE 0 END) AS FastestLaps FROM `races` r, drivers d WHERE r.series IN ('".$series."') AND r.year = '".$year."' AND r.driver_id=d.id GROUP BY r.driver HAVING FastestLaps > 0 ORDER BY 2 DESC) temp
+                    WHERE temp.FastestLaps=(SELECT MAX(ff.FastestLaps) FROM (SELECT r.driver, d.image, SUM(CASE WHEN r.fl='Y' THEN 1 ELSE 0 END) AS FastestLaps FROM `races` r, drivers d WHERE r.series IN ('".$series."') AND r.year = '".$year."' AND r.driver_id=d.id GROUP BY r.driver HAVING FastestLaps > 0 ORDER BY 2 DESC) ff)";
+$most_fastest_query_result = mysqli_query($conn, $most_fastest_sql);
+while ($row = mysqli_fetch_assoc($most_fastest_query_result)) {
+    $most_fastest_data[] = $row;
+}
 
 
 /**
@@ -272,10 +293,15 @@ while ($row = mysqli_fetch_assoc($footer_query_result)) {
                         <span>Driver with most modiums</span>
                     </div>
 
-                    <ul>
-                        <li>
-                        </li>
-                    </ul>
+                    <?php
+                    for ($i = 0; $i < count($most_podiums_data); $i++) { ?>
+                        <div class="table-row" style="margin-bottom: 5px;">
+                            <div class='pos'><b>Podiums :</b> &nbsp;<?php echo $most_podiums_data[$i]['Podiums']; ?></div>
+                            <div class='driver'><img src="<?php $_SERVER['DOCUMENT_ROOT']; ?>/results/flag/<?php echo $most_podiums_data[$i]['image']; ?>.gif">&nbsp;<b><?php echo $most_podiums_data[$i]['driver']; ?></b></div>
+                            <div class='pts'><b>Percent :</b> &nbsp;<?php echo $most_podiums_data[$i]['Percent']; ?></div>
+                        </div>
+                    <?php }
+                    ?>
                 </aside>
 
                 <?php dynamic_sidebar('HomeS1'); ?>
@@ -287,10 +313,14 @@ while ($row = mysqli_fetch_assoc($footer_query_result)) {
                         <span>Driver with most pole positions</span>
                     </div>
 
-                    <ul>
-                        <li>
-                        </li>
-                    </ul>
+                    <?php
+                    for ($i = 0; $i < count($most_pole_data); $i++) { ?>
+                        <div class="table-row" style="margin-bottom: 5px;">
+                            <div class='pos'><b>Pole :</b> &nbsp;<?php echo $most_pole_data[$i]['Poles']; ?></div>
+                            <div class='driver'><img src="<?php $_SERVER['DOCUMENT_ROOT']; ?>/results/flag/<?php echo $most_pole_data[$i]['image']; ?>.gif">&nbsp;<b><?php echo $most_pole_data[$i]['driver']; ?></b></div>
+                        </div>
+                    <?php }
+                    ?>
                 </aside>
 
                 <?php dynamic_sidebar('HomeS1'); ?>
@@ -302,10 +332,14 @@ while ($row = mysqli_fetch_assoc($footer_query_result)) {
                         <span>Driver with most fastest laps</span>
                     </div>
 
-                    <ul>
-                        <li>
-                        </li>
-                    </ul>
+                    <?php
+                    for ($i = 0; $i < count($most_fastest_data); $i++) { ?>
+                        <div class="table-row" style="margin-bottom: 5px;">
+                            <div class='pos'><b>Fastest :</b> &nbsp;<?php echo $most_fastest_data[$i]['FastestLaps']; ?></div>
+                            <div class='driver'><img src="<?php $_SERVER['DOCUMENT_ROOT']; ?>/results/flag/<?php echo $most_fastest_data[$i]['image']; ?>.gif">&nbsp;<b><?php echo $most_fastest_data[$i]['driver']; ?></b></div>
+                        </div>
+                    <?php }
+                    ?>
                 </aside>
 
                 <?php dynamic_sidebar('HomeS1'); ?>
