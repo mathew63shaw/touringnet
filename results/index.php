@@ -26,24 +26,10 @@ $events_circuits_sql = "SELECT e.event_id, e.round, e.date, e.circuit, e.`race_i
                         FROM (SELECT * FROM `event` WHERE `year`='" . $year . "' AND `series`='" . $series . "') e
                         LEFT JOIN circuits c
                         ON e.circuit = c.configuration
-                        ORDER BY e.round+0";
+                        ORDER BY e.round+0, e.date";
 $events_circuits_query_result = mysqli_query($conn, $events_circuits_sql);
 while ($row = mysqli_fetch_assoc($events_circuits_query_result)) {
-    $events_circuits_data[] = $row;
-}
-// Making rounds
-$rounds = 'Rounds ';
-$length = count($events_circuits_data);
-for ($i = 0; $i < $length - 2; $i++) {
-    $rounds .= $events_circuits_data[$i]['round'] . ', ';
-}
-$rounds .= $events_circuits_data[$length - 2]['round'] . ' and ' . $events_circuits_data[$length - 1]['round'];
-// Get date range
-$date_range_sql = "SELECT MIN(`date`) AS from_date, MAX(`date`) AS to_date FROM `event` WHERE `year`='" . $year . "' AND `series`='" . $series . "'";
-$date_range_query_result = mysqli_query($conn, $date_range_sql);
-$date_range = [];
-while ($row = mysqli_fetch_assoc($date_range_query_result)) {
-    $date_range[] = $row;
+    $events_circuits_data[$row['event_id']][] = [$row['round'], $row['date'], $row['circuit'], $row['race_id'], $row['qual_id'], $row['graphic_path']];
 }
 
 
@@ -82,14 +68,14 @@ if (mysqli_num_rows($top_ten_query_result)) { // classification = Drivers
 $most_wins_drivers = [];
 $most_wins_drivers_sql = "SELECT *
                             FROM (
-                            (SELECT races.driver, drivers.image,SUM(CASE WHEN races.year='2001' AND races.class_pos='1' AND races.class='' THEN 1 ELSE 0 END)+SUM(CASE WHEN races.year!='2001' AND races.result='1' AND races.class != 'P' THEN 1 ELSE 0 END) AS Wins, COUNT(races.driver) AS Races, ROUND(((SUM(CASE WHEN races.year='2001' AND races.class_pos='1' AND races.class='' THEN 1 ELSE 0 END)+SUM(CASE WHEN races.year!='2001' AND races.result='1' AND races.class != 'P' THEN 1 ELSE 0 END)) / COUNT(races.driver))*100,1) AS Percent FROM `drivers` INNER JOIN races ON drivers.id = races.driver_id WHERE `Series` IN ('".$series."') AND YEAR='".$year."' GROUP BY races.driver HAVING Wins > 0)
+                            (SELECT races.driver, drivers.image,SUM(CASE WHEN races.year='2001' AND races.class_pos='1' AND races.class='' THEN 1 ELSE 0 END)+SUM(CASE WHEN races.year!='2001' AND races.result='1' AND races.class != 'P' THEN 1 ELSE 0 END) AS Wins, COUNT(races.driver) AS Races, ROUND(((SUM(CASE WHEN races.year='2001' AND races.class_pos='1' AND races.class='' THEN 1 ELSE 0 END)+SUM(CASE WHEN races.year!='2001' AND races.result='1' AND races.class != 'P' THEN 1 ELSE 0 END)) / COUNT(races.driver))*100,1) AS Percent FROM `drivers` INNER JOIN races ON drivers.id = races.driver_id WHERE `Series` IN ('" . $series . "') AND YEAR='" . $year . "' GROUP BY races.driver HAVING Wins > 0)
                             UNION
-                            (SELECT races.driver2 AS Drvr2, drivers.image,SUM(CASE WHEN races.year='2001' AND races.class_pos='1' AND races.class='' THEN 1 ELSE 0 END)+SUM(CASE WHEN races.year!='2001' AND races.result='1' AND races.class != 'P' THEN 1 ELSE 0 END) AS Wins, (SELECT COUNT(races.driver) FROM `races` WHERE races.driver = Drvr2) + (SELECT COUNT(races.driver2) FROM `races` WHERE races.driver2 = Drvr2), ROUND(((SUM(CASE WHEN races.year='2001' AND races.class_pos='1' AND races.class='' THEN 1 ELSE 0 END)+SUM(CASE WHEN races.year!='2001' AND races.result='1' AND races.class != 'P' THEN 1 ELSE 0 END)) / (SELECT COUNT(races.driver2) FROM `races` WHERE races.driver = Drvr2))*100,1) AS Percent FROM `drivers` INNER JOIN races ON drivers.id = races.driver_id2 WHERE `Series` IN ('".$series."') AND YEAR='".$year."' GROUP BY races.driver2 HAVING Wins > 0)
+                            (SELECT races.driver2 AS Drvr2, drivers.image,SUM(CASE WHEN races.year='2001' AND races.class_pos='1' AND races.class='' THEN 1 ELSE 0 END)+SUM(CASE WHEN races.year!='2001' AND races.result='1' AND races.class != 'P' THEN 1 ELSE 0 END) AS Wins, (SELECT COUNT(races.driver) FROM `races` WHERE races.driver = Drvr2) + (SELECT COUNT(races.driver2) FROM `races` WHERE races.driver2 = Drvr2), ROUND(((SUM(CASE WHEN races.year='2001' AND races.class_pos='1' AND races.class='' THEN 1 ELSE 0 END)+SUM(CASE WHEN races.year!='2001' AND races.result='1' AND races.class != 'P' THEN 1 ELSE 0 END)) / (SELECT COUNT(races.driver2) FROM `races` WHERE races.driver = Drvr2))*100,1) AS Percent FROM `drivers` INNER JOIN races ON drivers.id = races.driver_id2 WHERE `Series` IN ('" . $series . "') AND YEAR='" . $year . "' GROUP BY races.driver2 HAVING Wins > 0)
                             ORDER BY 3 DESC) temp
                             WHERE temp.Wins=(SELECT MAX(ff.Wins) FROM (
-                            (SELECT races.driver, drivers.image,SUM(CASE WHEN races.year='2001' AND races.class_pos='1' AND races.class='' THEN 1 ELSE 0 END)+SUM(CASE WHEN races.year!='2001' AND races.result='1' AND races.class != 'P' THEN 1 ELSE 0 END) AS Wins, COUNT(races.driver) AS Races, ROUND(((SUM(CASE WHEN races.year='2001' AND races.class_pos='1' AND races.class='' THEN 1 ELSE 0 END)+SUM(CASE WHEN races.year!='2001' AND races.result='1' AND races.class != 'P' THEN 1 ELSE 0 END)) / COUNT(races.driver))*100,1) AS Percent FROM `drivers` INNER JOIN races ON drivers.id = races.driver_id WHERE `Series` IN ('".$series."') AND YEAR='".$year."' GROUP BY races.driver HAVING Wins > 0)
+                            (SELECT races.driver, drivers.image,SUM(CASE WHEN races.year='2001' AND races.class_pos='1' AND races.class='' THEN 1 ELSE 0 END)+SUM(CASE WHEN races.year!='2001' AND races.result='1' AND races.class != 'P' THEN 1 ELSE 0 END) AS Wins, COUNT(races.driver) AS Races, ROUND(((SUM(CASE WHEN races.year='2001' AND races.class_pos='1' AND races.class='' THEN 1 ELSE 0 END)+SUM(CASE WHEN races.year!='2001' AND races.result='1' AND races.class != 'P' THEN 1 ELSE 0 END)) / COUNT(races.driver))*100,1) AS Percent FROM `drivers` INNER JOIN races ON drivers.id = races.driver_id WHERE `Series` IN ('" . $series . "') AND YEAR='" . $year . "' GROUP BY races.driver HAVING Wins > 0)
                             UNION
-                            (SELECT races.driver2 AS Drvr2, drivers.image,SUM(CASE WHEN races.year='2001' AND races.class_pos='1' AND races.class='' THEN 1 ELSE 0 END)+SUM(CASE WHEN races.year!='2001' AND races.result='1' AND races.class != 'P' THEN 1 ELSE 0 END) AS Wins, (SELECT COUNT(races.driver) FROM `races` WHERE races.driver = Drvr2) + (SELECT COUNT(races.driver2) FROM `races` WHERE races.driver2 = Drvr2), ROUND(((SUM(CASE WHEN races.year='2001' AND races.class_pos='1' AND races.class='' THEN 1 ELSE 0 END)+SUM(CASE WHEN races.year!='2001' AND races.result='1' AND races.class != 'P' THEN 1 ELSE 0 END)) / (SELECT COUNT(races.driver2) FROM `races` WHERE races.driver = Drvr2))*100,1) AS Percent FROM `drivers` INNER JOIN races ON drivers.id = races.driver_id2 WHERE `Series` IN ('".$series."') AND YEAR='".$year."' GROUP BY races.driver2 HAVING Wins > 0)
+                            (SELECT races.driver2 AS Drvr2, drivers.image,SUM(CASE WHEN races.year='2001' AND races.class_pos='1' AND races.class='' THEN 1 ELSE 0 END)+SUM(CASE WHEN races.year!='2001' AND races.result='1' AND races.class != 'P' THEN 1 ELSE 0 END) AS Wins, (SELECT COUNT(races.driver) FROM `races` WHERE races.driver = Drvr2) + (SELECT COUNT(races.driver2) FROM `races` WHERE races.driver2 = Drvr2), ROUND(((SUM(CASE WHEN races.year='2001' AND races.class_pos='1' AND races.class='' THEN 1 ELSE 0 END)+SUM(CASE WHEN races.year!='2001' AND races.result='1' AND races.class != 'P' THEN 1 ELSE 0 END)) / (SELECT COUNT(races.driver2) FROM `races` WHERE races.driver = Drvr2))*100,1) AS Percent FROM `drivers` INNER JOIN races ON drivers.id = races.driver_id2 WHERE `Series` IN ('" . $series . "') AND YEAR='" . $year . "' GROUP BY races.driver2 HAVING Wins > 0)
                             ORDER BY 3 DESC) ff)";
 $most_wins_drivers_query_result = mysqli_query($conn, $most_wins_drivers_sql);
 while ($row = mysqli_fetch_assoc($most_wins_drivers_query_result)) {
@@ -102,8 +88,8 @@ while ($row = mysqli_fetch_assoc($most_wins_drivers_query_result)) {
  */
 $most_podiums_data = [];
 $most_podiums_sql = "SELECT *
-                    FROM (SELECT races.driver, drivers.image,SUM(CASE WHEN races.year='2001' AND races.class_pos IN ('1', '2', '3') AND races.class='' THEN 1 ELSE 0 END)+SUM(CASE WHEN races.year!='2001' AND races.result IN ('1', '2', '3') AND races.class != 'P' THEN 1 ELSE 0 END) AS Podiums, COUNT(races.driver) AS Races, ROUND(((SUM(CASE WHEN races.year='2001' AND races.class_pos IN ('1', '2', '3') AND races.class='' THEN 1 ELSE 0 END)+SUM(CASE WHEN races.year!='2001' AND races.result IN ('1', '2', '3') AND races.class != 'P' THEN 1 ELSE 0 END)) / COUNT(races.driver))*100,1) AS Percent FROM `drivers` INNER JOIN races ON drivers.id = races.driver_id WHERE `Series` IN ('".$series."') AND YEAR ='".$year."' GROUP BY races.driver HAVING Podiums > 0 ORDER BY 3 DESC) temp
-                    WHERE temp.Podiums=(SELECT MAX(ff.Podiums) FROM (SELECT races.driver, drivers.image,SUM(CASE WHEN races.year='2001' AND races.class_pos IN ('1', '2', '3') AND races.class='' THEN 1 ELSE 0 END)+SUM(CASE WHEN races.year!='2001' AND races.result IN ('1', '2', '3') AND races.class != 'P' THEN 1 ELSE 0 END) AS Podiums, COUNT(races.driver) AS Races, ROUND(((SUM(CASE WHEN races.year='2001' AND races.class_pos IN ('1', '2', '3') AND races.class='' THEN 1 ELSE 0 END)+SUM(CASE WHEN races.year!='2001' AND races.result IN ('1', '2', '3') AND races.class != 'P' THEN 1 ELSE 0 END)) / COUNT(races.driver))*100,1) AS Percent FROM `drivers` INNER JOIN races ON drivers.id = races.driver_id WHERE `Series` IN ('".$series."') AND YEAR ='".$year."' GROUP BY races.driver HAVING Podiums > 0 ORDER BY 3 DESC) ff)";
+                    FROM (SELECT races.driver, drivers.image,SUM(CASE WHEN races.year='2001' AND races.class_pos IN ('1', '2', '3') AND races.class='' THEN 1 ELSE 0 END)+SUM(CASE WHEN races.year!='2001' AND races.result IN ('1', '2', '3') AND races.class != 'P' THEN 1 ELSE 0 END) AS Podiums, COUNT(races.driver) AS Races, ROUND(((SUM(CASE WHEN races.year='2001' AND races.class_pos IN ('1', '2', '3') AND races.class='' THEN 1 ELSE 0 END)+SUM(CASE WHEN races.year!='2001' AND races.result IN ('1', '2', '3') AND races.class != 'P' THEN 1 ELSE 0 END)) / COUNT(races.driver))*100,1) AS Percent FROM `drivers` INNER JOIN races ON drivers.id = races.driver_id WHERE `Series` IN ('" . $series . "') AND YEAR ='" . $year . "' GROUP BY races.driver HAVING Podiums > 0 ORDER BY 3 DESC) temp
+                    WHERE temp.Podiums=(SELECT MAX(ff.Podiums) FROM (SELECT races.driver, drivers.image,SUM(CASE WHEN races.year='2001' AND races.class_pos IN ('1', '2', '3') AND races.class='' THEN 1 ELSE 0 END)+SUM(CASE WHEN races.year!='2001' AND races.result IN ('1', '2', '3') AND races.class != 'P' THEN 1 ELSE 0 END) AS Podiums, COUNT(races.driver) AS Races, ROUND(((SUM(CASE WHEN races.year='2001' AND races.class_pos IN ('1', '2', '3') AND races.class='' THEN 1 ELSE 0 END)+SUM(CASE WHEN races.year!='2001' AND races.result IN ('1', '2', '3') AND races.class != 'P' THEN 1 ELSE 0 END)) / COUNT(races.driver))*100,1) AS Percent FROM `drivers` INNER JOIN races ON drivers.id = races.driver_id WHERE `Series` IN ('" . $series . "') AND YEAR ='" . $year . "' GROUP BY races.driver HAVING Podiums > 0 ORDER BY 3 DESC) ff)";
 $most_podiums_query_result = mysqli_query($conn, $most_podiums_sql);
 while ($row = mysqli_fetch_assoc($most_podiums_query_result)) {
     $most_podiums_data[] = $row;
@@ -114,8 +100,8 @@ while ($row = mysqli_fetch_assoc($most_podiums_query_result)) {
  */
 $most_pole_data = [];
 $most_pole_sql = "SELECT *
-                FROM (SELECT q.`driver`, d.image, SUM(CASE WHEN q.result='1' THEN 1 ELSE 0 END) AS Poles FROM `qualifying` q, drivers d WHERE q.series IN ('".$series."') AND q.`year` = '".$year."' AND q.topq='Y' AND d.id=q.driver_id GROUP BY q.driver HAVING poles > 0 ORDER BY 2 DESC) temp
-                WHERE temp.Poles=(SELECT MAX(ff.Poles) FROM (SELECT q.`driver`, d.image, SUM(CASE WHEN q.result='1' THEN 1 ELSE 0 END) AS Poles FROM `qualifying` q, drivers d WHERE q.series IN ('".$series."') AND q.`year` = '".$year."' AND q.topq='Y' AND d.id=q.driver_id GROUP BY q.driver HAVING poles > 0 ORDER BY 2 DESC) ff)";
+                FROM (SELECT q.`driver`, d.image, SUM(CASE WHEN q.result='1' THEN 1 ELSE 0 END) AS Poles FROM `qualifying` q, drivers d WHERE q.series IN ('" . $series . "') AND q.`year` = '" . $year . "' AND q.topq='Y' AND d.id=q.driver_id GROUP BY q.driver HAVING poles > 0 ORDER BY 2 DESC) temp
+                WHERE temp.Poles=(SELECT MAX(ff.Poles) FROM (SELECT q.`driver`, d.image, SUM(CASE WHEN q.result='1' THEN 1 ELSE 0 END) AS Poles FROM `qualifying` q, drivers d WHERE q.series IN ('" . $series . "') AND q.`year` = '" . $year . "' AND q.topq='Y' AND d.id=q.driver_id GROUP BY q.driver HAVING poles > 0 ORDER BY 2 DESC) ff)";
 $most_pole_query_result = mysqli_query($conn, $most_pole_sql);
 while ($row = mysqli_fetch_assoc($most_pole_query_result)) {
     $most_pole_data[] = $row;
@@ -126,8 +112,8 @@ while ($row = mysqli_fetch_assoc($most_pole_query_result)) {
  */
 $most_fastest_data = [];
 $most_fastest_sql = "SELECT *
-                    FROM (SELECT r.driver, d.image, SUM(CASE WHEN r.fl='Y' THEN 1 ELSE 0 END) AS FastestLaps FROM `races` r, drivers d WHERE r.series IN ('".$series."') AND r.year = '".$year."' AND r.driver_id=d.id GROUP BY r.driver HAVING FastestLaps > 0 ORDER BY 2 DESC) temp
-                    WHERE temp.FastestLaps=(SELECT MAX(ff.FastestLaps) FROM (SELECT r.driver, d.image, SUM(CASE WHEN r.fl='Y' THEN 1 ELSE 0 END) AS FastestLaps FROM `races` r, drivers d WHERE r.series IN ('".$series."') AND r.year = '".$year."' AND r.driver_id=d.id GROUP BY r.driver HAVING FastestLaps > 0 ORDER BY 2 DESC) ff)";
+                    FROM (SELECT r.driver, d.image, SUM(CASE WHEN r.fl='Y' THEN 1 ELSE 0 END) AS FastestLaps FROM `races` r, drivers d WHERE r.series IN ('" . $series . "') AND r.year = '" . $year . "' AND r.driver_id=d.id GROUP BY r.driver HAVING FastestLaps > 0 ORDER BY 2 DESC) temp
+                    WHERE temp.FastestLaps=(SELECT MAX(ff.FastestLaps) FROM (SELECT r.driver, d.image, SUM(CASE WHEN r.fl='Y' THEN 1 ELSE 0 END) AS FastestLaps FROM `races` r, drivers d WHERE r.series IN ('" . $series . "') AND r.year = '" . $year . "' AND r.driver_id=d.id GROUP BY r.driver HAVING FastestLaps > 0 ORDER BY 2 DESC) ff)";
 $most_fastest_query_result = mysqli_query($conn, $most_fastest_sql);
 while ($row = mysqli_fetch_assoc($most_fastest_query_result)) {
     $most_fastest_data[] = $row;
@@ -147,7 +133,6 @@ $footer_sql = "SELECT r.series, r.year, s.title
                 ON r.series=s.code";
 $footer_query_result = mysqli_query($conn, $footer_sql);
 while ($row = mysqli_fetch_assoc($footer_query_result)) {
-    // $temp_title = $row['series'];
     $footer_data[$row['series']][] = [$row['title'], $row['year']];
 }
 
@@ -208,43 +193,56 @@ while ($row = mysqli_fetch_assoc($footer_query_result)) {
                 <div class="td-post-content">
 
                     <?php
-                    $i = 0;
-                    while ($i < $length) {
-                        $event_id = $events_circuits_data[$i]['event_id']; ?>
+                    foreach ($events_circuits_data as $key => $values) {
+                        // Making rounds
+                        $rounds = 'Rounds ';
+                        $length = count($values);
+                        if ($length == 1) {
+                            $rounds .= $values[0][0];
+                        } else if ($length == 2) {
+                            $rounds .= $values[0][0] . ' and ' . $values[1][0];
+                        } else {
+                            for ($i = 0; $i < $length - 2; $i++) {
+                                $rounds .= $values[$i][0] . ', ';
+                            }
+                            $rounds .= $values[$length - 2][0] . ' and ' . $values[$length - 1][0];
+                        }
+                        // Get min and max date
+                        $from = $values[0][1]; // since date field is ordered by date
+                        $to = $values[$length - 1][1];
+                    ?>
+
                         <div class="td-pb-span6" style="padding-left: 10px; padding-right: 10px">
                             <div class="custom-card">
-                                <img src="<?php $_SERVER['DOCUMENT_ROOT']; ?><?php echo $events_circuits_data[$i]['graphic_path']; ?>" title="<?php $events_circuits_data[$i]['circuit']; ?>" style="width: auto; height: auto;" />
+                                <img src="<?php $_SERVER['DOCUMENT_ROOT']; ?><?php echo $values[0][5]; ?>" title="<?php $values[0][2]; ?>" style="width: auto; height: auto;" />
                                 <p>
                                     <b><?php echo $rounds; ?></b>
                                     <br /><br />
 
-                                    <em><?php echo $date_range[0]['from_date']; ?> - <?php echo $date_range[0]['to_date']; ?></em>
+                                    <em><?php echo $from; ?> - <?php echo $to; ?></em>
                                     <br /><br />
 
-                                    <a href='qual<?php echo $events_circuits_data[$i]['qual_id']; ?>.php'>
+                                    <a href='qual<?php echo $values[0][4]; ?>.php'>
                                         Qualifying
                                     </a>
                                     <br />
 
                                     <ul>
                                         <?php
-                                        while ($event_id == $events_circuits_data[$i]['event_id']) { ?>
+                                        foreach ($values as $item) { ?>
                                             <li>
-                                                <a href='rd<?php echo $events_circuits_data[$i]['race_id']; ?>.php'>
-                                                    Round <?php echo $events_circuits_data[$i]['round']; ?>
+                                                <a href='rd<?php echo $item[3]; ?>.php'>
+                                                    Round <?php echo $item[0]; ?>
                                                 </a>
                                             </li>
-                                            <!-- <br /> -->
-                                        <?php $i++;
-                                        }
+                                        <?php }
                                         ?>
                                     </ul>
-
                                 </p>
                             </div>
                         </div>
-                    <?php }
-                    ?>
+
+                    <?php } ?>
 
                 </div>
             </div>
@@ -278,7 +276,6 @@ while ($row = mysqli_fetch_assoc($footer_query_result)) {
                         <div class="table-row" style="margin-bottom: 5px;">
                             <div class='pos'><b>Wins :</b> &nbsp;<?php echo $most_wins_drivers[$i]['Wins']; ?></div>
                             <div class='driver'><img src="<?php $_SERVER['DOCUMENT_ROOT']; ?>/results/flag/<?php echo $most_wins_drivers[$i]['image']; ?>.gif">&nbsp;<b><?php echo $most_wins_drivers[$i]['driver']; ?></b></div>
-                            <div class='pts'><b>Percent :</b> &nbsp;<?php echo $most_wins_drivers[$i]['Percent']; ?></div>
                         </div>
                     <?php }
                     ?>
@@ -290,7 +287,7 @@ while ($row = mysqli_fetch_assoc($footer_query_result)) {
             <div class="td-ss-main-sidebar">
                 <aside class="widget widget_meta">
                     <div class="block-title">
-                        <span>Driver with most modiums</span>
+                        <span>Driver with most podiums</span>
                     </div>
 
                     <?php
@@ -298,7 +295,6 @@ while ($row = mysqli_fetch_assoc($footer_query_result)) {
                         <div class="table-row" style="margin-bottom: 5px;">
                             <div class='pos'><b>Podiums :</b> &nbsp;<?php echo $most_podiums_data[$i]['Podiums']; ?></div>
                             <div class='driver'><img src="<?php $_SERVER['DOCUMENT_ROOT']; ?>/results/flag/<?php echo $most_podiums_data[$i]['image']; ?>.gif">&nbsp;<b><?php echo $most_podiums_data[$i]['driver']; ?></b></div>
-                            <div class='pts'><b>Percent :</b> &nbsp;<?php echo $most_podiums_data[$i]['Percent']; ?></div>
                         </div>
                     <?php }
                     ?>
