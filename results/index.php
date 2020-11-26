@@ -293,9 +293,6 @@ while ($row = mysqli_fetch_assoc($footer_query_result)) {
                                 </div>
                                 <div class="pos"><?php echo $top_ten_drivers[$i]['points']; ?></div>
                             </div>
-                            <?php if ($i == 0 && !empty($top_ten_drivers[$i]['profile'])) { ?>
-                                <div class='car'><img src='<?php $_SERVER['DOCUMENT_ROOT']; ?>/<?php echo $top_ten_drivers[$i]['profile']; ?>' /></div>
-                            <?php } ?>
                         </div>
                         <hr>
                     <?php }
@@ -305,6 +302,22 @@ while ($row = mysqli_fetch_assoc($footer_query_result)) {
                         <div class='standings-topten'><b><a href='<?php echo get_option('home'); ?>/database/standings.php?series=<?php echo $series; ?>&year=<?php echo $year; ?>'>Championship Standings</a></b></div>
                     </div>
 
+                </aside>
+
+                <?php dynamic_sidebar('HomeS1'); ?>
+            </div>
+
+            <div class="td-ss-main-sidebar">
+                <aside class="widget widget_meta custom-sidebar">
+                    <div class="block-title">
+                        <span>Champion</span>
+                    </div>
+
+                    <div class="table-row" style="margin-bottom: 10px;">
+                        <?php if (!empty($top_ten_drivers[0]['profile'])) { ?>
+                            <div class='car'><img src='<?php $_SERVER['DOCUMENT_ROOT']; ?>/<?php echo $top_ten_drivers[0]['profile']; ?>' /></div>
+                        <?php } ?>
+                    </div>
                 </aside>
 
                 <?php dynamic_sidebar('HomeS1'); ?>
