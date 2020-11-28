@@ -8,7 +8,7 @@ $header_column_sql = "SELECT e.event_id, e.circuit, e.round, c.code, c.abbreviat
                     FROM (SELECT * FROM `event` WHERE `year`=$year AND `series`='" . $series . "') e
                     LEFT JOIN circuits c
                     ON e.circuit = c.configuration
-                    ORDER BY e.round+0";
+                    ORDER BY e.date";
 $header_column_query_result = mysqli_query($conn, $header_column_sql);
 $temp_column_header = array();
 while ($row = mysqli_fetch_assoc($header_column_query_result)) {
