@@ -596,6 +596,14 @@ ksort($full_data);
 					$title.remove();
 				}
 			});
+
+			$(document).on("click", ".tt-suggestion", function() {
+				var url = '';
+				$(this).find('a').each(function() {
+					url = $(this).attr('href');
+				})
+				window.open(url, '_self');
+			});
 		</script>
 
 		<?php get_footer(); ?>
