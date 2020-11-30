@@ -265,6 +265,7 @@ ksort($full_data);
 		background: #e5e5e5;
 		margin-top: 5px;
 		margin-bottom: 10px;
+		width: 100%;
 	}
 
 	.yrsrs:nth-child(odd) {
@@ -441,161 +442,160 @@ ksort($full_data);
 
 									<div style="padding: 1px; min-width:28px;">
 										<!-- round -->
-										<div class="round" onclick="window.open('<?php echo $rd_link; ?>')">
-											<span>
-												<?php echo $header['round']; ?>
-											</span>
-										</div>
-
-										<!-- result -->
-										<?php
-										// if ($key == '2003BTCC') {
-										// }
-
-										?>
-										<?php if (array_key_exists($header['round'], ($shared_info[$key] ?? []))) {
-											if (array_key_exists($header['round'], ($main_data[$key] ?? []))) { // drove shared and his car 
-										?>
-												<div style="padding: 4px;" class="<?php echo $main_data[$key][$header['round']][1]; ?>">
-													<?php echo $main_data[$key][$header['round']][0] . '/' . $shared_info[$key][$header['round']][0]; ?>
-												</div>
-											<?php } else { // drove shared car 
-											?>
-												<div style="padding: 4px;" class="<?php echo  $shared_info[$key][$header['round']][1]; ?>">
-													<?php echo $shared_info[$key][$header['round']][0]; ?>
-												</div>
-											<?php }
-										} else if (array_key_exists($header['round'], ($main_data[$key] ?? []))) { // drove his car 
-											?>
-											<div style="padding: 4px;" class="<?php echo $main_data[$key][$header['round']][1]; ?>">
-												<?php echo $main_data[$key][$header['round']][0]; ?>
-											</div>
-										<?php } else { ?>
-											<div style="padding: 4px;">
-												<?php echo "-"; ?>
-											</div>
-										<?php }
-										?>
-
-										<!-- qual -->
-										<?php if (array_key_exists($header['round'], ($shared_info[$key] ?? []))) {
-											if (array_key_exists($header['round'], ($main_data[$key] ?? []))) { // drove shared and his car 
-										?>
-												<div style="padding: 4px;">
-													<?php echo $main_data[$key][$header['round']][8] . '/' . $shared_info[$key][$header['round']][8]; ?>
-												</div>
+										<?php if (!empty($data[$header['round']][10])) { ?>
+											<div class="round" onclick="window.open('<?php echo $rd_link; ?>')" ;?>
 											<?php } else { ?>
-												<div style="padding: 4px;">
-													<?php echo $shared_info[$key][$header['round']][8]; ?>
+												<div class="round">
+												<?php } ?>
+												<span>
+													<?php echo $header['round']; ?>
+												</span>
 												</div>
-											<?php }
-										} else if (array_key_exists($header['round'], ($main_data[$key] ?? []))) { // drove his car 
-											?>
-											<div style="padding: 4px;">
-												<?php echo $main_data[$key][$header['round']][8]; ?>
-											</div>
-										<?php
-										} else {
-										?>
-											<div style="padding: 4px;">
-												<?php echo "-"; ?>
-											</div>
-										<?php
-										}
-										?>
 
+												<!-- result -->
+												<?php if (array_key_exists($header['round'], ($shared_info[$key] ?? []))) {
+													if (array_key_exists($header['round'], ($main_data[$key] ?? []))) { // drove shared and his car 
+												?>
+														<div style="padding: 4px;" class="<?php echo $main_data[$key][$header['round']][1]; ?>">
+															<?php echo $main_data[$key][$header['round']][0] . '/' . $shared_info[$key][$header['round']][0]; ?>
+														</div>
+													<?php } else { // drove shared car 
+													?>
+														<div style="padding: 4px;" class="<?php echo  $shared_info[$key][$header['round']][1]; ?>">
+															<?php echo $shared_info[$key][$header['round']][0]; ?>
+														</div>
+													<?php }
+												} else if (array_key_exists($header['round'], ($main_data[$key] ?? []))) { // drove his car 
+													?>
+													<div style="padding: 4px;" class="<?php echo $main_data[$key][$header['round']][1]; ?>">
+														<?php echo $main_data[$key][$header['round']][0]; ?>
+													</div>
+												<?php } else { ?>
+													<div style="padding: 4px;">
+														<?php echo "-"; ?>
+													</div>
+												<?php }
+												?>
+
+												<!-- qual -->
+												<?php if (array_key_exists($header['round'], ($shared_info[$key] ?? []))) {
+													if (array_key_exists($header['round'], ($main_data[$key] ?? []))) { // drove shared and his car 
+												?>
+														<div style="padding: 4px;">
+															<?php echo $main_data[$key][$header['round']][8] . '/' . $shared_info[$key][$header['round']][8]; ?>
+														</div>
+													<?php } else { ?>
+														<div style="padding: 4px;">
+															<?php echo $shared_info[$key][$header['round']][8]; ?>
+														</div>
+													<?php }
+												} else if (array_key_exists($header['round'], ($main_data[$key] ?? []))) { // drove his car 
+													?>
+													<div style="padding: 4px;">
+														<?php echo $main_data[$key][$header['round']][8]; ?>
+													</div>
+												<?php
+												} else {
+												?>
+													<div style="padding: 4px;">
+														<?php echo "-"; ?>
+													</div>
+												<?php
+												}
+												?>
+
+											</div>
 									</div>
+								<?php } ?>
 								</div>
-							<?php } ?>
+
+								<br>
+
+							<?php }
+							?>
+
 						</div>
-
-						<br>
-
-					<?php }
-					?>
-
-				</div>
-			</div>
-
-			<div class="td-pb-span4 td-main-sidebar td-pb-border-top" style="padding-right: 40px; margin-top: 21px; padding-bottom: 16px;" role="complementary">
-				<div class="td-ss-main-sidebar">
-
-					<div class="clearfix"></div>
-					<aside class="widget_meta custom-sidebar">
-						<div class="block-title">
-							<span>Search for a driver</span>
-						</div>
-
-						<div class="panel panel-default">
-							<div class="bs-example">
-								<input type="text" name="typeahead" class="typeahead tt-query" autocomplete="off" spellcheck="false" placeholder="Type your Query">
-							</div>
-						</div>
-					</aside>
-					<div class="clearfix"></div>
-
-					<?php dynamic_sidebar('HomeS1'); ?>
 				</div>
 
-				<div class="td-ss-main-sidebar">
-					<aside class="widget widget_meta custom-sidebar" style="margin-top: 50px;">
-						<div class="block-title">
-							<span><?php echo ucwords(strtolower($name)); ?></span>
-						</div>
+				<div class="td-pb-span4 td-main-sidebar td-pb-border-top" style="padding-right: 40px; margin-top: 21px; padding-bottom: 16px;" role="complementary">
+					<div class="td-ss-main-sidebar">
 
-						<div class="table-row" style="margin-bottom: 10px;">
-							<?php if (!empty($driver_data[0][9])) { ?>
-								<div style="padding: 6px;"><img src='<?php $_SERVER['DOCUMENT_ROOT']; ?>/<?php echo $driver_data[0][9]; ?>' /></div>
-							<?php } ?>
-							<div class="custom-li">
-								<div><b>Nationality:</b></div>
-								<div><?php echo $driver_data[0][7]; ?></div>
+						<div class="clearfix"></div>
+						<aside class="widget_meta custom-sidebar">
+							<div class="block-title">
+								<span>Search for a driver</span>
 							</div>
-							<div class="custom-li">
-								<div><b>Date of birth:</b></div>
-								<div><?php echo $driver_data[0][8]; ?></div>
-							</div>
-							<div class="custom-li">
-								<div><b>Races (all series):</b></div>
-								<div><?php echo $driver_data[0][4]; ?></div>
-							</div>
-							<div class="custom-li">
-								<div><b>Victories (all series):</b></div>
-								<div><?php echo $driver_data[0][5]; ?></div>
-							</div>
-							<div class="custom-li">
-								<div><b>Podiums (all series):</b></div>
-								<div><?php echo $driver_data[0][6]; ?></div>
-							</div>
-							<br>
-							<div class="custom-li">
-								<div><b>Series raced in:</b></div>
-								<div><?php echo $series_raced_in; ?></div>
-							</div>
-							<div class="custom-li">
-								<div><b>Years active:</b></div>
-								<div><?php echo $driver_data[0][1]; ?> - <?php echo $driver_data[0][2]; ?></div>
-							</div>
-						</div>
-					</aside>
 
-					<?php dynamic_sidebar('HomeS1'); ?>
+							<div class="panel panel-default">
+								<div class="bs-example">
+									<input type="text" name="typeahead" class="typeahead tt-query" autocomplete="off" spellcheck="false" placeholder="Type your Query">
+								</div>
+							</div>
+						</aside>
+						<div class="clearfix"></div>
+
+						<?php dynamic_sidebar('HomeS1'); ?>
+					</div>
+
+					<div class="td-ss-main-sidebar">
+						<aside class="widget widget_meta custom-sidebar" style="margin-top: 50px;">
+							<div class="block-title">
+								<span><?php echo ucwords(strtolower($name)); ?></span>
+							</div>
+
+							<div class="table-row" style="margin-bottom: 10px;">
+								<?php if (!empty($driver_data[0][9])) { ?>
+									<div style="padding: 6px;"><img src='<?php $_SERVER['DOCUMENT_ROOT']; ?>/<?php echo $driver_data[0][9]; ?>' /></div>
+								<?php } ?>
+								<div class="custom-li">
+									<div><b>Nationality:</b></div>
+									<div><?php echo $driver_data[0][7]; ?></div>
+								</div>
+								<div class="custom-li">
+									<div><b>Date of birth:</b></div>
+									<div><?php echo $driver_data[0][8]; ?></div>
+								</div>
+								<div class="custom-li">
+									<div><b>Races (all series):</b></div>
+									<div><?php echo $driver_data[0][4]; ?></div>
+								</div>
+								<div class="custom-li">
+									<div><b>Victories (all series):</b></div>
+									<div><?php echo $driver_data[0][5]; ?></div>
+								</div>
+								<div class="custom-li">
+									<div><b>Podiums (all series):</b></div>
+									<div><?php echo $driver_data[0][6]; ?></div>
+								</div>
+								<br>
+								<div class="custom-li">
+									<div><b>Series raced in:</b></div>
+									<div><?php echo $series_raced_in; ?></div>
+								</div>
+								<div class="custom-li">
+									<div><b>Years active:</b></div>
+									<div><?php echo $driver_data[0][1]; ?> - <?php echo $driver_data[0][2]; ?></div>
+								</div>
+							</div>
+						</aside>
+
+						<?php dynamic_sidebar('HomeS1'); ?>
+					</div>
 				</div>
+
 			</div>
 
 		</div>
 
-	</div>
+		<script>
+			$(".more-info").click(function() {
+				var $title = $(this).find(".title");
+				if (!$title.length) {
+					$(this).append('<span class="title">' + $(this).attr("title") + '</span>');
+				} else {
+					$title.remove();
+				}
+			});
+		</script>
 
-	<script>
-		$(".more-info").click(function() {
-			var $title = $(this).find(".title");
-			if (!$title.length) {
-				$(this).append('<span class="title">' + $(this).attr("title") + '</span>');
-			} else {
-				$title.remove();
-			}
-		});
-	</script>
-
-	<?php get_footer(); ?>
+		<?php get_footer(); ?>
