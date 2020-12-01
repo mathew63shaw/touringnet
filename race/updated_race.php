@@ -74,6 +74,10 @@ $resultnext = mysqli_query($conn, $sqlnext);
 		.tb-row:nth-of-type(odd):not(.header):hover {
 			background-color: #d1d5ff;
 		}
+
+		.column.time {
+			overflow-wrap: break-word;
+		}
 	</style>
 
 </head>
@@ -103,7 +107,7 @@ $resultnext = mysqli_query($conn, $sqlnext);
 												}
 											} else {
 												echo "Unknown";
-											}	?> result</h4>
+											}	?> Results</h4>
 
 							<div class="tb-row header">
 								<div class="wrapper pos-nr-cl">
@@ -136,7 +140,7 @@ $resultnext = mysqli_query($conn, $sqlnext);
 								while ($row = mysqli_fetch_assoc($result)) {
 									echo "<div class='tb-row'>
 										<div class='wrapper pos-nr-cl'><div class='column pos'><span class='circled'>" . $row["pos"] . "</span></div><div class='column nr'><span class='number'>" . $row["number"] . "</span></div><div class='column cl'>" . (($row["class"] == 'M' or $row["class"] == 'I') ? '<span class="spanclass">' : "") . $row["class"] . (($row["class"] == 'M' or $row["class"] == 'I') ? '</span>' : "") . "</div></div>
-										<div class='wrapper driver-nat'><div class='column driver'><a href='driver.php?name=" . $row["driver"] . "'>" . $row["driver"] . "</a>" . ($row["driver2"] ? '<br><a href="driver.php?name='.$row["driver2"].'">' . $row["driver2"] . '</a>' : '') . ($row["driver3"] ? '<br><a href="driver.php?name=' . $row["driver3"] . '">' . $row["driver3"] . '</a>' : '') . ($row["driver4"] ? '<br><a href="driver.php?name=' . $row["driver4"] . '">' . $row["driver4"] . '</a>' : '') . "</div><div class='column nat'><img src='../results/flag/" . $row["img"] . ".gif' /></div></div>
+										<div class='wrapper driver-nat'><div class='column driver'><a href='driver.php?name=" . $row["driver"] . "'>" . $row["driver"] . "</a>" . ($row["driver2"] ? '<br><a href="driver.php?name=' . $row["driver2"] . '">' . $row["driver2"] . '</a>' : '') . ($row["driver3"] ? '<br><a href="driver.php?name=' . $row["driver3"] . '">' . $row["driver3"] . '</a>' : '') . ($row["driver4"] ? '<br><a href="driver.php?name=' . $row["driver4"] . '">' . $row["driver4"] . '</a>' : '') . "</div><div class='column nat'><img src='../results/flag/" . $row["img"] . ".gif' /></div></div>
 										<div class='wrapper entrant-car'><div class='column entrant'>" . $row["entrant"] . "</div><div class='column car'>" . $row["car"] . "</div></div>
 										<div class='wrapper laps-time-best-gd'><div class='wrapper laps-time'><div class='column laps'>" . $row["laps"] . "</div><div class='column time'>" . $row["time"] . "</div></div><div class='wrapper best-gd'><div class='column best'>" . (($row["best"] == 'Unknown') ? '' : $row["best"]) . "</div><div class='column gd'>" . $row["qual"] . "</div></div></div>
 									  </div>";
