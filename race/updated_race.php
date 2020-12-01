@@ -1,5 +1,7 @@
 <?php
-require('../wp-blog-header.php');
+define('WP_USE_THEMES', false);
+require($_SERVER['DOCUMENT_ROOT'] . '/wp-load.php');
+
 require('../results/connection.php');
 
 mysqli_set_charset($conn, "utf8");
@@ -11,16 +13,23 @@ $id2 = $id;
 $sid = $_GET['series'];
 $sid = mysqli_real_escape_string($conn, $sid);
 
-$sql = "SELECT CASE WHEN CAST(races.result AS UNSIGNED) = 0 THEN result ELSE CAST(races.result AS UNSIGNED) END AS pos,
-races.number, races.class, races.driver, races.driver2, races.driver3, races.driver4, drivers.image AS img, races.entrant, races.car, races.laps, 
-races.time, races.best, races.qual, races.id 
+$sql = "SELECT CASE WHEN CAST(races.result AS UNSIGNED) = 0 THEN result ELSE CAST(races.result AS UNSIGNED) END AS pos,races.number, races.class,
+races.driver, races.driver_id, races.driver2, races.driver_id2, races.driver3, races.driver_id3, races.driver4, races.driver_id4,
+drivers.image AS img, races.entrant, races.car, races.laps, races.time, races.best, races.qual, races.id 
 FROM `drivers` 
 INNER JOIN races 
 ON drivers.id = races.driver_id
 WHERE races.race_id = {$id} AND races.result > 0
 ORDER BY id, pos ASC";
 
-$sqlnc = "select case when cast(races.result as unsigned) = 0 then result else cast(races.result as unsigned) end as pos, races.number, races.class, races.driver, drivers.image as img, races.entrant, races.car, races.laps, races.time, races.best, races.qual, races.id from `drivers` INNER JOIN races on drivers.id = races.driver_id where races.race_id = '" . $id . "' and races.result = 0 order by id, pos asc";
+$sqlnc = "SELECT CASE WHEN CAST(races.result AS UNSIGNED) = 0 THEN result ELSE CAST(races.result AS UNSIGNED) END AS pos, races.number, races.class,
+races.driver, races.driver_id, races.driver2, races.driver_id2, races.driver3, races.driver_id3, races.driver4, races.driver_id4,
+drivers.image AS img, races.entrant, races.car, races.laps, races.time, races.best, races.qual, races.id
+FROM `drivers` 
+INNER JOIN races 
+ON drivers.id = races.driver_id
+WHERE races.race_id = {$id} AND races.result = 0
+ORDER BY id, pos ASC";
 
 $sql2 = "SELECT DISTINCT track, races.`series`, races.`year`, races.`round`, DATE FROM races WHERE race_id = {$id}";
 
@@ -44,10 +53,21 @@ $resultcircuit = mysqli_query($conn, $sqlcircuit);
 $resultnotes = mysqli_query($conn, $sqlnotes);
 $resultprev = mysqli_query($conn, $sqlprev);
 $resultnext = mysqli_query($conn, $sqlnext);
-// var_dump($result);
-// var_dump($result2);
-// var_dump($result3);
 
+$sqldrivers = "SELECT id, image AS img FROM drivers ORDER BY id";
+$drivers_result = mysqli_query($conn, $sqldrivers);
+$drivers = [];
+while ($row = mysqli_fetch_assoc($drivers_result)) {
+	$drivers[$row['id']] = $row['img'];
+}
+
+
+while ($row = mysqli_fetch_assoc($result2)) {
+	$series = $row['series'];
+	$year = $row['year'];
+	$track = $row['track'];
+	$round = $row['round'];
+}
 
 
 ?>
@@ -58,7 +78,7 @@ $resultnext = mysqli_query($conn, $sqlnext);
 
 <head profile="http://gmpg.org/xfn/11">
 	<meta http-equiv="Content-Type" content="<?php bloginfo('html_type'); ?>; charset=<?php bloginfo('charset'); ?>" />
-	<title><?php bloginfo('name'); ?> &raquo; Database &raquo; <?php echo ucwords(strtolower($id)); ?> Race Wins</title>
+	<title><?php bloginfo('name'); ?> &raquo; Database &raquo; <?php echo $series . " " . $year; ?> &raquo; Round <?php echo $round; ?> Results</title>
 	<link rel="stylesheet/less" type="text/css" href="flex2.less" />
 	<script src="//cdnjs.cloudflare.com/ajax/libs/less.js/3.0.0/less.min.js"></script>
 
@@ -78,13 +98,25 @@ $resultnext = mysqli_query($conn, $sqlnext);
 		.column.time {
 			overflow-wrap: break-word;
 		}
+
+		.laps-time,
+		.best-gd {
+			flex-direction: column;
+			white-space: nowrap;
+			display: inline-block;
+			clear: both;
+		}
+
+		.gd {
+			float: right;
+		}
 	</style>
 
 </head>
 
 <?php get_header(); ?>
 
-<body>
+<body style="display: none;">
 	<div class="td-container">
 
 		<div class="td-pb-row">
@@ -95,20 +127,15 @@ $resultnext = mysqli_query($conn, $sqlnext);
 
 					<div class="clearfix"></div>
 
-					<a href='../../'><?php bloginfo('name'); ?></a> &raquo; Statistics &raquo; <?php echo ucwords(strtolower($id2)); ?> <?php echo ucwords($sid); ?> race results
+					<a href='../../'><?php bloginfo('name'); ?></a> &raquo; <a href="index.php?series=<?php echo $series; ?>&year=<?php echo $year; ?>">Database</a> &raquo; <?php echo $series . " " . $year; ?> &raquo; Round <?php echo $round; ?> Results
 
 					<div class="stats-div">
 
 						<div class="container-fluid" style="margin-top: 10px">
 
-							<h4 class="h4h"><?php if (mysqli_num_rows($result2) > 0) {
-												while ($row = mysqli_fetch_assoc($result2)) {
-													echo $row['series'] . " > " . $row['year'] . " > " . $row["track"] . " Round " . $row['round'];
-												}
-											} else {
-												echo "Unknown";
-											}	?> Results</h4>
-
+							<h4 class="h4h">
+								<?php echo $series . " > " . $year . " > " . $track . " Round " . $round; ?> Results
+							</h4>
 							<div class="tb-row header">
 								<div class="wrapper pos-nr-cl">
 									<div class="column pos"><span class="circled">P</span></div>
@@ -140,7 +167,9 @@ $resultnext = mysqli_query($conn, $sqlnext);
 								while ($row = mysqli_fetch_assoc($result)) {
 									echo "<div class='tb-row'>
 										<div class='wrapper pos-nr-cl'><div class='column pos'><span class='circled'>" . $row["pos"] . "</span></div><div class='column nr'><span class='number'>" . $row["number"] . "</span></div><div class='column cl'>" . (($row["class"] == 'M' or $row["class"] == 'I') ? '<span class="spanclass">' : "") . $row["class"] . (($row["class"] == 'M' or $row["class"] == 'I') ? '</span>' : "") . "</div></div>
-										<div class='wrapper driver-nat'><div class='column driver'><a href='driver.php?name=" . $row["driver"] . "'>" . $row["driver"] . "</a>" . ($row["driver2"] ? '<br><a href="driver.php?name=' . $row["driver2"] . '">' . $row["driver2"] . '</a>' : '') . ($row["driver3"] ? '<br><a href="driver.php?name=' . $row["driver3"] . '">' . $row["driver3"] . '</a>' : '') . ($row["driver4"] ? '<br><a href="driver.php?name=' . $row["driver4"] . '">' . $row["driver4"] . '</a>' : '') . "</div><div class='column nat'><img src='../results/flag/" . $row["img"] . ".gif' /></div></div>
+										<div class='wrapper driver-nat'>
+										<div class='column driver'><a href='driver.php?name=" . $row["driver"] . "'>" . $row["driver"] . "</a>" . ($row["driver2"] ? '<br><a href="driver.php?name=' . $row["driver2"] . '">' . $row["driver2"] . '</a>' : '') . ($row["driver3"] ? '<br><a href="driver.php?name=' . $row["driver3"] . '">' . $row["driver3"] . '</a>' : '') . ($row["driver4"] ? '<br><a href="driver.php?name=' . $row["driver4"] . '">' . $row["driver4"] . '</a>' : '') . "</div>
+										<div class='column nat'><img src='../results/flag/" . $row["img"] . ".gif' />" . ($row["driver2"] ? '<img src="../results/flag/' . $drivers[$row['driver_id2']] . '.gif" />' : '') . ($row["driver3"] ? '<img src="../results/flag/' . $drivers[$row['driver_id3']] . '.gif" />' : '') . ($row["driver4"] ? '<img src="../results/flag/' . $drivers[$row['driver_id4']] . '.gif" />' : '') . "</div></div>
 										<div class='wrapper entrant-car'><div class='column entrant'>" . $row["entrant"] . "</div><div class='column car'>" . $row["car"] . "</div></div>
 										<div class='wrapper laps-time-best-gd'><div class='wrapper laps-time'><div class='column laps'>" . $row["laps"] . "</div><div class='column time'>" . $row["time"] . "</div></div><div class='wrapper best-gd'><div class='column best'>" . (($row["best"] == 'Unknown') ? '' : $row["best"]) . "</div><div class='column gd'>" . $row["qual"] . "</div></div></div>
 									  </div>";
@@ -160,7 +189,9 @@ $resultnext = mysqli_query($conn, $sqlnext);
 								while ($row = mysqli_fetch_assoc($resultnc)) {
 									echo "<div class='tb-row'>
 										<div class='wrapper pos-nr-cl'><div class='column pos'><span class='circled'>" . $row["pos"] . "</span></div><div class='column nr'><span class='number'>" . $row["number"] . "</span></div><div class='column cl'>" . (($row["class"] == 'M' or $row["class"] == 'I') ? '<span class="spanclass">' : "") . $row["class"] . (($row["class"] == 'M' or $row["class"] == 'I') ? '</span>' : "") . "</div></div>
-										<div class='wrapper driver-nat'><div class='column driver'><a href='driver.php?name=" . $row["driver"] . "'>" . $row["driver"] . "</a></div><div class='column nat'><img src='../results/flag/" . $row["img"] . ".gif' /></div></div>
+										<div class='wrapper driver-nat'>
+										<div class='column driver'><a href='driver.php?name=" . $row["driver"] . "'>" . $row["driver"] . "</a>" . ($row["driver2"] ? '<br><a href="driver.php?name=' . $row["driver2"] . '">' . $row["driver2"] . '</a>' : '') . ($row["driver3"] ? '<br><a href="driver.php?name=' . $row["driver3"] . '">' . $row["driver3"] . '</a>' : '') . ($row["driver4"] ? '<br><a href="driver.php?name=' . $row["driver4"] . '">' . $row["driver4"] . '</a>' : '') . "</div>
+										<div class='column nat'><img src='../results/flag/" . $row["img"] . ".gif' />" . ($row["driver2"] ? '<img src="../results/flag/' . $drivers[$row['driver_id2']] . '.gif" />' : '') . ($row["driver3"] ? '<img src="../results/flag/' . $drivers[$row['driver_id3']] . '.gif" />' : '') . ($row["driver4"] ? '<img src="../results/flag/' . $drivers[$row['driver_id4']] . '.gif" />' : '') . "</div></div>
 										<div class='wrapper entrant-car'><div class='column entrant'>" . $row["entrant"] . "</div><div class='column car'>" . $row["car"] . "</div></div>
 										<div class='wrapper laps-time-best-gd'><div class='wrapper laps-time'><div class='column laps'>" . $row["laps"] . "</div><div class='column time'>" . $row["time"] . "</div></div><div class='wrapper best-gd'><div class='column best'>" . (($row["best"] == 'Unknown') ? '' : $row["best"]) . "</div><div class='column gd'>" . $row["qual"] . "</div></div></div>
 									  </div>";
@@ -256,3 +287,9 @@ $resultnext = mysqli_query($conn, $sqlnext);
 	</div><!-- End of td-container div -->
 
 	<?php get_footer(); ?>
+
+	<script>
+		(function() {
+			jQuery('body').css('display', 'block');
+		})();
+	</script>
