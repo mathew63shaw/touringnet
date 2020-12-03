@@ -54,6 +54,28 @@ $resultnotes = mysqli_query($conn, $sqlnotes);
 $resultprev = mysqli_query($conn, $sqlprev);
 $resultnext = mysqli_query($conn, $sqlnext);
 
+
+// Check existing more than one driver
+$race_results = [];
+$no_exit_more_than_one_driver = 1;
+while ($row = mysqli_fetch_assoc($result)) {
+	$race_results[] = $row;
+	if ($row['driver2'] || $row['driver3'] || $row['driver4']) {
+		$no_exit_more_than_one_driver = 0;
+	}
+}
+
+$nc_results = [];
+$no_exit_more_than_one_driver_nc = 1;
+while ($row = mysqli_fetch_assoc($resultnc)) {
+	$nc_results[] = $row;
+	if ($row['driver2'] || $row['driver3'] || $row['driver4']) {
+		$no_exit_more_than_one_driver_nc = 0;
+	}
+}
+
+
+// Drivers data
 $sqldrivers = "SELECT id, image AS img FROM drivers ORDER BY id";
 $drivers_result = mysqli_query($conn, $sqldrivers);
 $drivers = [];
@@ -67,10 +89,7 @@ while ($row = mysqli_fetch_assoc($result2)) {
 	$year = $row['year'];
 	$track = $row['track'];
 	$round = $row['round'];
-}
-
-
-?>
+} ?>
 
 <!DOCTYPE html>
 
@@ -107,8 +126,27 @@ while ($row = mysqli_fetch_assoc($result2)) {
 			clear: both;
 		}
 
+		.no-one-more-driver {
+			white-space: nowrap;
+			clear: both;
+		}
+		.laps-time {
+			white-space: nowrap;
+			clear: both;
+		}
+
+		/* .no-one-more-driver .column.time {
+			text-align: center;
+		} */
+
 		.gd {
 			float: right;
+		}
+
+		.pos-nr-cl,
+		.driver-nat {
+			align-items: center;
+			justify-content: center;
 		}
 	</style>
 
@@ -117,11 +155,11 @@ while ($row = mysqli_fetch_assoc($result2)) {
 <?php get_header(); ?>
 
 <body style="display: none;">
-	<div class="td-container">
+	<div class="td-container-wrap" style="padding: 20px;">
 
 		<div class="td-pb-row">
 
-			<div class="td-pb-span12" style="border-right: 1px solid #E6E6E6;">
+			<div class="td-pb-span12">
 
 				<div class="td-ss-main-content">
 
@@ -133,9 +171,12 @@ while ($row = mysqli_fetch_assoc($result2)) {
 
 						<div class="container-fluid" style="margin-top: 10px">
 
-							<h4 class="h4h">
-								<?php echo $series . " > " . $year . " > " . $track . " Round " . $round; ?> Results
-							</h4>
+							<div class="td_block_wrap tdb_title tdi_78_07e tdb-single-title td-pb-border-top td_block_template_1" style="margin-bottom: 10px;">
+								<div class="tdb-block-inner td-fix-index">
+									<h1 class="tdb-title-text" style="font-family: Oxygen; font-size: 20px; font-weight: 800; line-height: 25px; width: 100%;"><?php echo $series . " " . $year . " &raquo; " . $track . " Round " . $round; ?> Results</h1>
+								</div>
+							</div>
+
 							<div class="tb-row header">
 								<div class="wrapper pos-nr-cl">
 									<div class="column pos"><span class="circled">P</span></div>
@@ -151,27 +192,27 @@ while ($row = mysqli_fetch_assoc($result2)) {
 									<div class="column car">Car</div>
 								</div>
 								<div class="wrapper laps-time-best-gd">
-									<div class="wrapper laps-time">
+									<div class="<?php echo ($no_exit_more_than_one_driver ? 'wrapper no-one-more-driver' : 'wrapper laps-time'); ?>">
 										<div class="column laps">Lap</div>
 										<div class="column time">Time</div>
 									</div>
-									<div class="wrapper best-gd">
+									<div class="<?php echo ($no_exit_more_than_one_driver ? 'wrapper no-one-more-driver' : 'wrapper best-gd'); ?>">
 										<div class="column best">Best</div>
 										<div class="column gd">Gd</div>
 									</div>
 								</div>
 							</div>
 
-							<?php if (mysqli_num_rows($result) > 0) {
+							<?php if (count($race_results) > 0) {
 								// output data of each row
-								while ($row = mysqli_fetch_assoc($result)) {
+								foreach ($race_results as $row) {
 									echo "<div class='tb-row'>
 										<div class='wrapper pos-nr-cl'><div class='column pos'><span class='circled'>" . $row["pos"] . "</span></div><div class='column nr'><span class='number'>" . $row["number"] . "</span></div><div class='column cl'>" . (($row["class"] == 'M' or $row["class"] == 'I') ? '<span class="spanclass">' : "") . $row["class"] . (($row["class"] == 'M' or $row["class"] == 'I') ? '</span>' : "") . "</div></div>
 										<div class='wrapper driver-nat'>
 										<div class='column driver'><a href='driver.php?name=" . $row["driver"] . "'>" . $row["driver"] . "</a>" . ($row["driver2"] ? '<br><a href="driver.php?name=' . $row["driver2"] . '">' . $row["driver2"] . '</a>' : '') . ($row["driver3"] ? '<br><a href="driver.php?name=' . $row["driver3"] . '">' . $row["driver3"] . '</a>' : '') . ($row["driver4"] ? '<br><a href="driver.php?name=' . $row["driver4"] . '">' . $row["driver4"] . '</a>' : '') . "</div>
 										<div class='column nat'><img src='../results/flag/" . $row["img"] . ".gif' />" . ($row["driver2"] ? '<img src="../results/flag/' . $drivers[$row['driver_id2']] . '.gif" />' : '') . ($row["driver3"] ? '<img src="../results/flag/' . $drivers[$row['driver_id3']] . '.gif" />' : '') . ($row["driver4"] ? '<img src="../results/flag/' . $drivers[$row['driver_id4']] . '.gif" />' : '') . "</div></div>
 										<div class='wrapper entrant-car'><div class='column entrant'>" . $row["entrant"] . "</div><div class='column car'>" . $row["car"] . "</div></div>
-										<div class='wrapper laps-time-best-gd'><div class='wrapper laps-time'><div class='column laps'>" . $row["laps"] . "</div><div class='column time'>" . $row["time"] . "</div></div><div class='wrapper best-gd'><div class='column best'>" . (($row["best"] == 'Unknown') ? '' : $row["best"]) . "</div><div class='column gd'>" . $row["qual"] . "</div></div></div>
+										<div class='wrapper laps-time-best-gd'><div class='" . ($no_exit_more_than_one_driver ? 'wrapper no-one-more-driver' : 'wrapper laps-time') . "'><div class='column laps'>" . $row["laps"] . "</div><div class='column time'>" . $row["time"] . "</div></div><div class='" . ($no_exit_more_than_one_driver ? 'wrapper no-one-more-driver' : 'wrapper laps-time') . "'><div class='column best'>" . (($row["best"] == 'Unknown') ? '' : $row["best"]) . "</div><div class='column gd'>" . $row["qual"] . "</div></div></div>
 									  </div>";
 								}
 							} else {
@@ -184,16 +225,16 @@ while ($row = mysqli_fetch_assoc($result2)) {
 								<div style="width: 100%;">Not classified</div>
 							</div>
 
-							<?php if (mysqli_num_rows($resultnc) > 0) {
+							<?php if (count($nc_results) > 0) {
 								// output data of each row
-								while ($row = mysqli_fetch_assoc($resultnc)) {
+								foreach ($nc_results as $row) {
 									echo "<div class='tb-row'>
 										<div class='wrapper pos-nr-cl'><div class='column pos'><span class='circled'>" . $row["pos"] . "</span></div><div class='column nr'><span class='number'>" . $row["number"] . "</span></div><div class='column cl'>" . (($row["class"] == 'M' or $row["class"] == 'I') ? '<span class="spanclass">' : "") . $row["class"] . (($row["class"] == 'M' or $row["class"] == 'I') ? '</span>' : "") . "</div></div>
 										<div class='wrapper driver-nat'>
 										<div class='column driver'><a href='driver.php?name=" . $row["driver"] . "'>" . $row["driver"] . "</a>" . ($row["driver2"] ? '<br><a href="driver.php?name=' . $row["driver2"] . '">' . $row["driver2"] . '</a>' : '') . ($row["driver3"] ? '<br><a href="driver.php?name=' . $row["driver3"] . '">' . $row["driver3"] . '</a>' : '') . ($row["driver4"] ? '<br><a href="driver.php?name=' . $row["driver4"] . '">' . $row["driver4"] . '</a>' : '') . "</div>
 										<div class='column nat'><img src='../results/flag/" . $row["img"] . ".gif' />" . ($row["driver2"] ? '<img src="../results/flag/' . $drivers[$row['driver_id2']] . '.gif" />' : '') . ($row["driver3"] ? '<img src="../results/flag/' . $drivers[$row['driver_id3']] . '.gif" />' : '') . ($row["driver4"] ? '<img src="../results/flag/' . $drivers[$row['driver_id4']] . '.gif" />' : '') . "</div></div>
 										<div class='wrapper entrant-car'><div class='column entrant'>" . $row["entrant"] . "</div><div class='column car'>" . $row["car"] . "</div></div>
-										<div class='wrapper laps-time-best-gd'><div class='wrapper laps-time'><div class='column laps'>" . $row["laps"] . "</div><div class='column time'>" . $row["time"] . "</div></div><div class='wrapper best-gd'><div class='column best'>" . (($row["best"] == 'Unknown') ? '' : $row["best"]) . "</div><div class='column gd'>" . $row["qual"] . "</div></div></div>
+										<div class='wrapper laps-time-best-gd'><div class='" . ($no_exit_more_than_one_driver_nc ? 'wrapper no-one-more-driver' : 'wrapper laps-time') . "'><div class='column laps'>" . $row["laps"] . "</div><div class='column time'>" . $row["time"] . "</div></div><div class='" . ($no_exit_more_than_one_driver_nc ? 'wrapper no-one-more-driver' : 'wrapper laps-time') . "'><div class='column best'>" . (($row["best"] == 'Unknown') ? '' : $row["best"]) . "</div><div class='column gd'>" . $row["qual"] . "</div></div></div>
 									  </div>";
 								}
 							} else {
