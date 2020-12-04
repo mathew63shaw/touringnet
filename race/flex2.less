@@ -5,8 +5,10 @@
  @pos-width: 25px;
  @nr-width: 25px;
  @cl-width: 20px;
- @driver-width: 195px; // was 212
- @nat-width: 24px;
+//  @driver-width: 195px; // was 212
+ @driver-width: 219px; // was 212
+//  @nat-width: 24px;
+ @nat-width: 0px;
  @entrant-width: 190px; // was 305
  @car-width: 175px; // was 215
  @laps-width: 24px;
@@ -137,11 +139,11 @@
 	width: @best-gd-width;
   }
   
-  .driver {
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    overflow: hidden; 
-  }
+  // .driver {
+  //   text-overflow: ellipsis;
+  //   white-space: nowrap;
+  //   overflow: hidden; 
+  // }
   .entrant-car {
     .vertical-growing();
     width: @entrant-car-width;
@@ -190,13 +192,14 @@
     width: 15px !important;
   }
   .driver {
-    width: 80px !important;
+    width: 95px !important;
+    // width: 80px !important;
   }
   .pos-nr-cl {
     width: 20px !important;
   }
   .circled {
-    width: 15px !important;
+    width: 20px !important;
   }
 }
 
@@ -212,13 +215,15 @@
   // Line up driver, nat into the next column
   .driver-nat {
     // .vertical();
-	width: 125px;
+	width: 149px;
+	// width: 125px;
   }
   .driver {
-    width: 101px;   
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    overflow: hidden; 
+    width: 125px;   
+    // width: 101px;   
+    // text-overflow: ellipsis;
+    // white-space: nowrap;
+    // overflow: hidden; 
   }
   .driver a {
     border-bottom: 1px dashed #000000;
@@ -275,13 +280,15 @@
   // Line up driver, nat into the next column
   .driver-nat {
     // .vertical-growing();
-	  width: 125px;
+	  // width: 125px;
+	  width: 149px;
   }
   .driver {
-    width: 101px;   
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    overflow: hidden; 
+    // width: 101px;   
+    width: 125px;   
+    // text-overflow: ellipsis;
+    // white-space: nowrap;
+    // overflow: hidden; 
   }
   .driver a {
     border-bottom: 1px dashed #000000;
@@ -418,4 +425,71 @@ body {
 }
 .laps-time-best-gd {
   justify-content: center;
+}
+
+/**
+from php
+*/
+.tb-row:nth-of-type(even) {
+  background-color: #f7f7f7;
+}
+
+.tb-row:nth-of-type(even):hover {
+  background-color: #d1d5ff;
+}
+
+.tb-row:nth-of-type(odd):not(.header):hover {
+  background-color: #d1d5ff;
+}
+
+.column.time {
+  overflow-wrap: break-word;
+}
+
+.laps-time,
+.best-gd {
+  flex-direction: column;
+  white-space: nowrap;
+  display: inline-block;
+  clear: both;
+}
+
+.no-one-more-driver {
+  white-space: nowrap;
+  clear: both;
+}
+
+.laps-time {
+  white-space: nowrap;
+  clear: both;
+}
+
+/* .no-one-more-driver .column.time {
+  text-align: center;
+} */
+
+.gd {
+  float: right;
+}
+
+.pos-nr-cl,
+.driver-nat {
+  align-items: center;
+  justify-content: center;
+}
+
+.inline-driver-nat {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.inline-driver-nat img {
+  height: fit-content;
+  margin-top: 3px;
+}
+
+.led-laps {
+  display: flex;
+  justify-content: space-around;
 }
