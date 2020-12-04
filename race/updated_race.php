@@ -42,6 +42,9 @@ $sqlnotes = "SELECT distinct notes.note from notes LEFT JOIN races on races.race
 $sqlprev = "SELECT distinct race_id FROM races where race_id = (select max(race_id) from races where race_id < '" . $id . "')";
 $sqlnext = "SELECT distinct race_id FROM races where race_id = (select min(race_id) from races where race_id > '" . $id . "')";
 
+$sql_series_prev = "SELECT MAX(race_id) AS prev_race_id, series, `year` FROM races WHERE series=(SELECT series FROM races WHERE race_id = ${id} LIMIT 1) AND race_id < ${id}";
+$sql_series_next = "SELECT MIN(race_id) AS next_race_id, series, `year` FROM races WHERE series=(SELECT series FROM races WHERE race_id = ${id} LIMIT 1) AND race_id > ${id}";
+
 $fastest_lap_sql = "SELECT driver, best FROM races WHERE FL = 'Y' AND race_id = {$id}";
 $laps_led_sql = "SELECT driver, laps_led FROM races WHERE laps_led > 0 AND race_id = {$id}";
 
@@ -65,6 +68,8 @@ $resultcircuit = mysqli_query($conn, $sqlcircuit);
 $resultnotes = mysqli_query($conn, $sqlnotes);
 $resultprev = mysqli_query($conn, $sqlprev);
 $resultnext = mysqli_query($conn, $sqlnext);
+$result_series_prev = mysqli_query($conn, $sql_series_prev);
+$result_series_next = mysqli_query($conn, $sql_series_next);
 $fastest_lap_result = mysqli_query($conn, $fastest_lap_sql);
 $laps_led_result = mysqli_query($conn, $laps_led_sql);
 $footer_result = mysqli_query($conn, $footer_sql);
@@ -322,8 +327,8 @@ while ($row = mysqli_fetch_assoc($result2)) {
 											<?php if (mysqli_num_rows($laps_led_result) > 0) {
 												while ($row = mysqli_fetch_assoc($laps_led_result)) { ?>
 													<div class="led-laps">
-														<div><?php $row['driver']; ?></div>
-														<div><?php $row['laps_led']; ?></div>
+														<div><?php echo $row['driver']; ?></div>
+														<div><?php echo $row['laps_led']; ?></div>
 													</div>
 											<?php }
 											} else {
@@ -367,6 +372,33 @@ while ($row = mysqli_fetch_assoc($result2)) {
 								<?php if (mysqli_num_rows($resultnext) > 0) {
 									while ($row = mysqli_fetch_assoc($resultnext)) {
 										echo "<span class='nextrace'><a href='race.php?id=" . $row["race_id"] . "'>Next race</a></span>";
+									}
+								} else {
+									echo "";
+								}	?>
+								<div style="clear: both;"></div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- Previous and Next series race buttons -->
+			<div class="td-pb-span12" style="margin-top: 5px;">
+				<div class="td-ss-main-content">
+					<div class="stats-div">
+						<div class="container-fluid">
+							<div style="width: 100%; padding-bottom: 5px;">
+								<?php if ((mysqli_num_rows($result_series_prev) > 0) && $row["prev_race_id"]) {
+									while ($row = mysqli_fetch_assoc($result_series_prev)) {
+										echo "<span class='prevrace'><a href='race.php?id=" . $row["prev_race_id"] . "'>Previous race (" . $series . ")</a></span>";
+									}
+								} else {
+									echo "";
+								}	?>
+								<?php if ((mysqli_num_rows($result_series_next) > 0) && $row["next_race_id"]) {
+									while ($row = mysqli_fetch_assoc($result_series_next)) {
+										echo "<span class='nextrace'><a href='race.php?id=" . $row["next_race_id"] . "'>Next race (" . $series . ")</a></span>";
 									}
 								} else {
 									echo "";
