@@ -389,16 +389,16 @@ while ($row = mysqli_fetch_assoc($result2)) {
 					<div class="stats-div">
 						<div class="container-fluid">
 							<div style="width: 100%; padding-bottom: 5px;">
-								<?php if ((mysqli_num_rows($result_series_prev) > 0) && $row["prev_race_id"]) {
+								<?php if (mysqli_num_rows($result_series_prev) > 0) {
 									while ($row = mysqli_fetch_assoc($result_series_prev)) {
-										echo "<span class='prevrace'><a href='race.php?id=" . $row["prev_race_id"] . "'>Previous race (" . $series . ")</a></span>";
+										echo $row['prev_race_id'] ? "<span class='prevrace'><a href='race.php?id=" . $row["prev_race_id"] . "'>Previous race (" . $series . ")</a></span>" : "";
 									}
 								} else {
 									echo "";
 								}	?>
-								<?php if ((mysqli_num_rows($result_series_next) > 0) && $row["next_race_id"]) {
+								<?php if (mysqli_num_rows($result_series_next) > 0) {
 									while ($row = mysqli_fetch_assoc($result_series_next)) {
-										echo "<span class='nextrace'><a href='race.php?id=" . $row["next_race_id"] . "'>Next race (" . $series . ")</a></span>";
+										echo $row["next_race_id"] ? "<span class='nextrace'><a href='race.php?id=" . $row["next_race_id"] . "'>Next race (" . $series . ")</a></span>" : "";
 									}
 								} else {
 									echo "";
