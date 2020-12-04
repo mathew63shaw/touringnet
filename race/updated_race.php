@@ -31,7 +31,7 @@ ON drivers.id = races.driver_id
 WHERE races.race_id = {$id} AND races.result = 0
 ORDER BY id, pos ASC";
 
-$sql2 = "SELECT DISTINCT track, races.`series`, races.`year`, races.`round`, DATE FROM races WHERE race_id = {$id}";
+$sql2 = "SELECT DISTINCT circuits.`layout`, races.`series`, races.`year`, races.`round`, DATE FROM races, circuits WHERE races.race_id = {$id} AND races.`track` = circuits.`configuration`";
 
 $sql3 = "select distinct concat(year,series) as yrseries from races where driver = '" . $id . "' ";
 
@@ -104,7 +104,7 @@ while ($row = mysqli_fetch_assoc($drivers_result)) {
 while ($row = mysqli_fetch_assoc($result2)) {
 	$series = $row['series'];
 	$year = $row['year'];
-	$track = $row['track'];
+	$layout = $row['layout'];
 	$round = $row['round'];
 } ?>
 
@@ -140,7 +140,7 @@ while ($row = mysqli_fetch_assoc($result2)) {
 
 							<div class="td_block_wrap tdb_title tdi_78_07e tdb-single-title td-pb-border-top td_block_template_1" style="margin-bottom: 10px;">
 								<div class="tdb-block-inner td-fix-index">
-									<h1 class="tdb-title-text" style="font-family: Oxygen; font-size: 20px; font-weight: 800; line-height: 25px; width: 100%;"><?php echo $series . " " . $year . " &raquo; " . $track . " Round " . $round; ?> Results</h1>
+									<h1 class="tdb-title-text" style="font-family: Oxygen; font-size: 20px; font-weight: 800; line-height: 25px; width: 100%;"><?php echo $series . " " . $year . " &raquo; " . $layout . " Round " . $round; ?> Results</h1>
 								</div>
 							</div>
 
