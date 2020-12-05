@@ -2,19 +2,26 @@
  * Define the widths: play around with these to get a best fit.
  */
  
- @pos-width: 25px;
- @nr-width: 25px;
- @cl-width: 20px;
+ @pos-width: 35px;
+//  @pos-width: 25px;
+ @nr-width: 35px;
+//  @nr-width: 25px;
+ @cl-width: 0px;
+//  @cl-width: 20px;
 //  @driver-width: 195px; // was 212
  @driver-width: 219px; // was 212
 //  @nat-width: 24px;
  @nat-width: 0px;
  @entrant-width: 190px; // was 305
  @car-width: 175px; // was 215
- @laps-width: 24px;
+ @laps-width: 34px;
+//  @laps-width: 24px; + 10
+//  @time-width: 72px; + 20
  @time-width: 72px;
- @best-width: 62px;
- @gd-width: 24px;
+ @best-width: 0px;
+//  @best-width: 62px;
+ @gd-width: 56px;
+//  @gd-width: 24px; + 32
  @margin-width: 30px;
  
 /*
@@ -200,6 +207,9 @@
   }
   .circled {
     width: 20px !important;
+  }
+  .laps-time-best-gd, .laps-time {
+      width: 72px !important;
   }
 }
 
@@ -448,9 +458,9 @@ from php
 
 .laps-time,
 .best-gd {
-  flex-direction: column;
+//   flex-direction: column;
   white-space: nowrap;
-  display: inline-block;
+//   display: inline-block;
   clear: both;
 }
 
@@ -460,8 +470,9 @@ from php
 }
 
 .laps-time {
-  white-space: nowrap;
-  clear: both;
+    text-align: center;
+    white-space: nowrap;
+    clear: both;
 }
 
 /* .no-one-more-driver .column.time {
