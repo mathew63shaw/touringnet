@@ -1,0 +1,495 @@
+/*
+ * Define the widths: play around with these to get a best fit.
+ */
+ 
+ @pos-width: 25px;
+ @nr-width: 25px;
+ @cl-width: 20px;
+//  @driver-width: 195px; // was 212
+ @driver-width: 219px; // was 212
+//  @nat-width: 24px;
+ @nat-width: 0px;
+ @entrant-width: 190px; // was 305
+ @car-width: 175px; // was 215
+ @laps-width: 24px;
+ @time-width: 72px;
+ @best-width: 62px;
+ @gd-width: 24px;
+ @margin-width: 30px;
+ 
+/*
+ * Basic styles, good for a large display. Everything fits in
+ * one row, no wrapping. All text based cells grow equally.
+ */
+ 
+.tb-row {
+	display: flex;          display: -webkit-flex;
+	 flex-direction: row;    -webkit-flex-direction: row;
+	 flex-wrap: no-wrap;     -webkit-flex-wrap: no-wrap;
+	 width: 100%;
+	 padding-left: 15px;
+	 padding-right: 15px;
+ }
+ 
+.wrapper {
+  display: flex; display: -webkit-flex;
+  flex-direction: row; -webkit-flex-direction: row;
+}
+
+// leaf level containers (cells): common properties 
+.column {
+  flex-grow: 0; -webkit-flex-grow: 0;
+  flex-shrink: 0; -webkit-flex-shrink: 0;
+  vertical-align: top;
+}
+
+// leaf level containers: widths
+.pos { width: @pos-width; }
+.nr { width: @nr-width; }
+.cl { width: @cl-width; }
+.driver { width: @driver-width; word-break: break-word; hyphens: auto; }
+.nat { width: @nat-width; }
+.entrant { width: @entrant-width; word-wrap: break-word; }
+.car { width: @car-width; }
+.laps { width: @laps-width; }
+.time { width: @time-width; }
+.best { width: @best-width; text-align: right; }
+.gd { width: @gd-width; text-align: right; }
+
+// these are growable text containers, with ellipsis to show truncated text
+.entrant, .car {
+  flex-grow: 1; -webkit-flex-grow: 1;
+  overflow: hidden;
+  //white-space: nowrap; Removed to allow teams to expand
+  text-overflow: ellipsis;
+  padding-right: 4px;
+  padding-left: 3px;
+  display: flex;
+  align-items: center;
+}
+
+/* growable wrappers */
+.entrant-car {
+  flex-grow: 1; -webkit-flex-grow: 1;
+}
+
+// Wrapper widths
+@pos-nr-cl-width: max(@pos-width, @nr-width, @cl-width);
+@driver-nat-width: max(@driver-width, @nat-width);
+@entrant-car-width: max(@entrant-width, @car-width);
+@entrant-car-width2: 170px;
+@laps-time-best-gd-width: max(@laps-width, @time-width, @best-width, @gd-width);
+@laps-time-width: max(@laps-width, @time-width);
+@best-gd-width: max(@best-width, @gd-width);
+
+.horizontal() {
+  flex-direction: row;        -webkit-flex-direction: row;
+}
+
+.vertical() {
+  // Let the wrapper flex vertically, so we get 2 rows
+  flex-direction: column;     -webkit-flex-direction: column;
+  // can't have the children grow, since this now means vertical growth
+  div {
+    flex-grow: 0;  -webkit-flex-grow: 0;
+  }
+}
+
+.vertical-growing() {
+  .vertical();
+  > div {
+    // Let immediate child divs grow horizontally, 100% to fill the wrapper
+    width: 100%;
+  }
+}
+
+@media all and (min-width: (@margin-width * 2 + @pos-width + @nr-width + @cl-width + @driver-width + @nat-width + @laps-width + @time-width + @gd-width) ) {
+.entrant {
+  white-space: nowrap;
+}
+}
+
+// First break: as many 2-row fields as possible. This will leave Severity
+// and Dates still horizontal, as they are odd numbered
+@media all and (max-width: (@margin-width * 2 + @pos-width + @nr-width + @cl-width + @driver-width + @nat-width + @laps-width + @time-width + @gd-width) ) {
+
+  .pos-nr-cl {
+    .vertical();
+    width: @pos-nr-cl-width;
+  }
+  .driver-nat {
+    // .vertical();
+	width: 200px;
+  }
+
+}
+
+// Switch Entrant-Car to vertical and laps-time-best-gd to vertical
+@media all and (max-width: (@margin-width * 2 + @pos-width + @nr-width + @cl-width + @driver-width + @nat-width + @entrant-width + @car-width + @laps-width + @time-width + @best-width * 4 + @gd-width + 9) ) {
+	.entrant-car {
+    .vertical-growing();
+	width: @entrant-car-width;
+	}
+	.laps-time {
+    .vertical-growing();
+	width: @laps-time-width;
+	}
+	.best-gd {
+    .vertical-growing();
+	width: @best-gd-width;
+  }
+  
+  // .driver {
+  //   text-overflow: ellipsis;
+  //   white-space: nowrap;
+  //   overflow: hidden; 
+  // }
+  .entrant-car {
+    .vertical-growing();
+    width: @entrant-car-width;
+    // flex-flow: wrap;
+  }
+
+  .no-one-more-driver {
+    .vertical();
+    flex-wrap: wrap-reverse;
+  }
+
+  .best, .time, .laps {
+    text-align: right;
+  }
+
+  // .laps-time-best-gd {
+  //   text-align: right;
+  //   .vertical();
+  //   flex-wrap: wrap-reverse;
+  // }
+  // .laps, .time, .best {
+  //   border-bottom: 1px dashed #000000;
+  // }
+
+}
+
+@media all and (max-width: 675px) {
+  .laps-time-best-gd, .no-one-more-driver {
+    text-align: right;
+    .vertical();
+    flex-wrap: wrap-reverse;
+  }
+  .best {
+    text-align: right;
+  }
+  .laps, .time, .best {
+    border-bottom: 1px dashed #000000;
+  }
+  .driver-nat, .entrant-car, .laps-time-best-gd {
+    font-size: 11px;
+  }
+}
+
+@media all and (max-width: 320px) {
+  .nat {
+    width: 15px !important;
+  }
+  .driver {
+    width: 95px !important;
+    // width: 80px !important;
+  }
+  .pos-nr-cl {
+    width: 20px !important;
+  }
+  .circled {
+    width: 20px !important;
+  }
+}
+
+// Next: as many 3-rows as possible
+@media all and (max-width: (@margin-width * 2 + @pos-nr-cl-width + @driver-nat-width + @entrant-car-width + @laps-time-best-gd-width) ) {
+
+  .pos-nr-cl {
+    .vertical();
+    width: @pos-nr-cl-width;
+    text-align: center;
+  }
+
+  // Line up driver, nat into the next column
+  .driver-nat {
+    // .vertical();
+	width: 149px;
+	// width: 125px;
+  }
+  .driver {
+    width: 125px;   
+    // width: 101px;   
+    // text-overflow: ellipsis;
+    // white-space: nowrap;
+    // overflow: hidden; 
+  }
+  .driver a {
+    border-bottom: 1px dashed #000000;
+  }
+  .driver-nat, .entrant-car, .laps-time-best-gd {
+    font-size: 11px;
+  }
+  // Line up laps, time, best, gd in one column
+  .laps-time-best-gd, .no-one-more-driver {
+    text-align: right;
+    .vertical();
+    flex-wrap: wrap-reverse;
+  }
+  .best {
+    text-align: right;
+  }
+  .laps, .time, .best {
+    border-bottom: 1px dashed #000000;
+  }
+}
+
+// Next: break on too long after entrant
+@media all and (max-width: (@margin-width * 2 + @pos-nr-cl-width
+  + @driver-nat-width + @entrant-car-width) ) {
+  
+  .pos-nr-cl {
+    .vertical();
+    width: @pos-nr-cl-width;
+    text-align: center;
+  }
+  .entrant {
+	border-bottom: 1px dashed #000000;
+  }
+  .laps {
+  width: 60px;
+  }
+  .container-fluid > .tb-row:first-child .laps::after {
+   content: "";
+  }
+  .laps::after {
+   content: "";
+  }
+  
+  .gd {
+  width: 60px;
+  }
+  .container-fluid > .tb-row:first-child .gd::before {
+   content: "";
+  }
+  .gd::before {
+   content: "";
+  }
+
+  // Line up driver, nat into the next column
+  .driver-nat {
+    // .vertical-growing();
+	  // width: 125px;
+	  width: 149px;
+  }
+  .driver {
+    // width: 101px;   
+    width: 125px;   
+    // text-overflow: ellipsis;
+    // white-space: nowrap;
+    // overflow: hidden; 
+  }
+  .driver a {
+    border-bottom: 1px dashed #000000;
+  }
+  .laps, .time, .best {
+    border-bottom: 1px dashed #000000;
+  }
+  .driver-nat, .entrant-car, .laps-time-best-gd {
+    font-size: 11px;
+  }
+  .entrant-car {
+    .vertical-growing();
+    width: @entrant-car-width;
+    // flex-flow: wrap;
+  }
+  // Line up laps, time, best, gd in one column
+  .laps-time-best-gd, .no-one-more-driver {
+    .vertical();
+    text-align: right;
+    flex-wrap: wrap-reverse;
+  }
+
+  .best {
+    text-align: right;
+  }
+
+}
+
+
+
+/*
+
+Taken from https://codepen.io/vasansr/pen/jWazPM
+see also https://hashnode.com/post/really-responsive-tables-using-css3-flexbox-cijzbxd8n00pwvm53sl4l42cx
+
+*/
+
+
+/*
+ * General good-look styles, not mandatory.
+ */
+body {
+  font-size: 13px;
+}
+.tb-row {
+  border-bottom: 1px dashed #000000;
+  border-collapse: collapse;
+  padding-top: 5px;
+}
+.tb-row.header {
+  background-color: #000000!important;
+  color: #FFFFFF;
+  font-weight: bold;
+  font-size: 11px;
+  padding-top: 8px;
+  padding-bottom: 8px;
+}
+.header .circled {
+	color: #000000;
+}
+.circled {
+	width: 22px;
+	height: 18px;
+	padding: 0px 1px 2px 1px;
+	//border-radius: 50%;
+	font-weight: bold;
+	font-size: 11px;
+	text-align: center;
+	background-color: #FFFFFF;
+	display: inline-block;
+	border: 1px solid #000000;
+	margin-bottom: 4px;
+	line-height: 18px;
+}
+.cl {
+	font-size: 11px;
+}
+.number {
+	width: 20px;
+	height: 20px;
+	padding: 1px 1px 1px 1px;
+	font-style: italic;
+	font-size: 11px;
+	text-align: center;
+	display: inline-block;
+}
+.spanclass {
+	width: 17px;
+	height: 20px;
+	padding: 1px 1px 1px 1px;
+	font-weight: bold;
+	font-size: 11px;
+	text-align: center;
+	color: #FFFFFF;
+	background-color: #F1545A;
+	display: inline-block;
+}
+.prevrace {
+	float: left;
+	font-weight: bold;
+	background-color: #000000;
+	border: 1px solid #000000;
+	padding: 5px;
+	border-radius: 3px;
+}
+.prevrace a {
+	color: #FFFFFF;
+}
+.prevrace:hover {
+	color: 000000;
+	background-color: #FFFFFF;
+	border: 1px solid #000000;
+}
+.prevrace:hover a {
+	color: #000000;
+}
+.nextrace {
+	float: right;
+	font-weight: bold;
+	background-color: #000000;
+	padding: 5px;
+	border-radius: 3px;
+}
+.nextrace a {
+	color: #FFFFFF;
+}
+.nextrace:hover {
+	color: #000000;
+	background-color: #FFFFFF;
+	border: 1px solid #000000;
+}
+.nextrace:hover a {
+	color: #000000;
+}
+.laps-time-best-gd {
+  justify-content: center;
+}
+
+/**
+from php
+*/
+.tb-row:nth-of-type(even) {
+  background-color: #f7f7f7;
+}
+
+.tb-row:nth-of-type(even):hover {
+  background-color: #d1d5ff;
+}
+
+.tb-row:nth-of-type(odd):not(.header):hover {
+  background-color: #d1d5ff;
+}
+
+.column.time {
+  overflow-wrap: break-word;
+}
+
+.laps-time,
+.best-gd {
+  flex-direction: column;
+  white-space: nowrap;
+  display: inline-block;
+  clear: both;
+}
+
+.no-one-more-driver {
+  white-space: nowrap;
+  clear: both;
+}
+
+.laps-time {
+  white-space: nowrap;
+  clear: both;
+}
+
+/* .no-one-more-driver .column.time {
+  text-align: center;
+} */
+
+.gd {
+  float: right;
+}
+
+.pos-nr-cl,
+.driver-nat {
+  align-items: center;
+  justify-content: center;
+}
+
+.inline-driver-nat {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.inline-driver-nat img {
+  height: fit-content;
+  margin-top: 3px;
+}
+
+.led-laps {
+  display: flex;
+  justify-content: space-around;
+}
