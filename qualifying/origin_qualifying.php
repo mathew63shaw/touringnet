@@ -35,8 +35,8 @@ $sqlnext = "SELECT DISTINCT qual_id FROM qualifying WHERE qual_id = (SELECT MIN(
 $sql_series_prev = "SELECT MAX(qual_id) AS prev_race_id, series, `year` FROM qualifying WHERE series=(SELECT series FROM qualifying WHERE qual_id = {$id} LIMIT 1) AND qual_id < {$id}";
 $sql_series_next = "SELECT MIN(qual_id) AS next_race_id, series, `year` FROM qualifying WHERE series=(SELECT series FROM qualifying WHERE qual_id = {$id} LIMIT 1) AND qual_id > {$id}";
 
-$footer_sql = "SELECT r.round, c.layout, r.race_id
-FROM (SELECT rr.`round`, rr.track, rr.`race_id`
+$footer_sql = "SELECT r.round, c.layout, r.qual_id
+FROM (SELECT rr.`round`, rr.track, rr.`qual_id`
 FROM qualifying rr, (SELECT series, `year` FROM qualifying WHERE qual_id = {$id} LIMIT 1) temp
 WHERE rr.series=temp.series AND rr.`year`=temp.year
 GROUP BY rr.`round`) r
@@ -267,7 +267,7 @@ function print_q($results, $no_exit_more_than_one_driver, $drivers, $index)
 									  </div>";
                                 }
                             } else {
-                                echo "<p>All entries were classified in the race.</p>";
+                                echo "<p style='padding: 5px;'>All entries were classified in the race.</p>";
                             }
 
                             mysqli_close($conn);
@@ -349,14 +349,14 @@ function print_q($results, $no_exit_more_than_one_driver, $drivers, $index)
                             <div style="width: 100%; padding-bottom: 5px;">
                                 <?php if (mysqli_num_rows($resultprev) > 0) {
                                     while ($row = mysqli_fetch_assoc($resultprev)) {
-                                        echo "<span class='prevrace'><a href='race.php?id=" . $row["race_id"] . "'>Previous race</a></span>";
+                                        echo "<span class='prevrace'><a href='qualifying.php?id=" . $row["qual_id"] . "'>Previous race</a></span>";
                                     }
                                 } else {
                                     echo "";
                                 }    ?>
                                 <?php if (mysqli_num_rows($resultnext) > 0) {
                                     while ($row = mysqli_fetch_assoc($resultnext)) {
-                                        echo "<span class='nextrace'><a href='race.php?id=" . $row["race_id"] . "'>Next race</a></span>";
+                                        echo "<span class='nextrace'><a href='qualifying.php?id=" . $row["qual_id"] . "'>Next race</a></span>";
                                     }
                                 } else {
                                     echo "";
@@ -376,14 +376,14 @@ function print_q($results, $no_exit_more_than_one_driver, $drivers, $index)
                             <div style="width: 100%; padding-bottom: 5px;">
                                 <?php if (mysqli_num_rows($result_series_prev) > 0) {
                                     while ($row = mysqli_fetch_assoc($result_series_prev)) {
-                                        echo $row['prev_race_id'] ? "<span class='prevrace'><a href='race.php?id=" . $row["prev_race_id"] . "'>Previous race (" . $series . ")</a></span>" : "";
+                                        echo $row['prev_race_id'] ? "<span class='prevrace'><a href='qualifying.php?id=" . $row["prev_race_id"] . "'>Previous race (" . $series . ")</a></span>" : "";
                                     }
                                 } else {
                                     echo "";
                                 }    ?>
                                 <?php if (mysqli_num_rows($result_series_next) > 0) {
                                     while ($row = mysqli_fetch_assoc($result_series_next)) {
-                                        echo $row["next_race_id"] ? "<span class='nextrace'><a href='race.php?id=" . $row["next_race_id"] . "'>Next race (" . $series . ")</a></span>" : "";
+                                        echo $row["next_race_id"] ? "<span class='nextrace'><a href='qualifying.php?id=" . $row["next_race_id"] . "'>Next race (" . $series . ")</a></span>" : "";
                                     }
                                 } else {
                                     echo "";
@@ -405,7 +405,7 @@ function print_q($results, $no_exit_more_than_one_driver, $drivers, $index)
                         <div style="width: 100%; padding: 5px;">
                             <?php if (mysqli_num_rows($footer_result) > 0) {
                                 while ($row = mysqli_fetch_assoc($footer_result)) {
-                                    echo "<a href='race.php?id={$row['race_id']}'>Round " . $row['round'] . ": " . $row['layout'] . "</a>,&nbsp;";
+                                    echo "<a href='qualifying.php?id={$row['qual_id']}'>Round " . $row['round'] . ": " . $row['layout'] . "</a>,&nbsp;";
                                 }
                                 echo "<a href='index.php?series={$series}&year={$year}'>" . $series . " " . $year . "</a>";
                             } else {
