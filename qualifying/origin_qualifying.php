@@ -82,6 +82,7 @@ while ($row = mysqli_fetch_assoc($result)) {
     }
 }
 
+
 $nc_results = [];
 $no_exit_more_than_one_driver_nc = 1;
 while ($row = mysqli_fetch_assoc($resultnc)) {
@@ -111,9 +112,9 @@ while ($row = mysqli_fetch_assoc($result2)) {
     $round = $row['round'];
 }
 
-function print_q($results, $no_exit_more_than_one_driver, $drivers, $index)
+function print_q($results, $no_exit_more_than_one_driver, $drivers, $title)
 {
-    $html = '<h6>QUALIFYING - Q' . $index . '</h6>
+    $html = '<h6>' . ($title ? 'QUALIFYING - ' . $title : 'QUALIFYING') . '</h6>
             <div class="tb-row header"><div class="wrapper pos-nr-cl">
                 <div class="column pos"><span class="circled">P</span></div>
                     <div class="column nr"><span class="number">NO</span></div>
@@ -213,30 +214,29 @@ function print_q($results, $no_exit_more_than_one_driver, $drivers, $index)
                             </div>
 
                             <?php
-                            if (count($q1_results) > 0) {
-                                print_q($q1_results, $no_exit_more_than_one_driver, $drivers, 1);
-                            }
-
-                            if (count($q2_results) > 0) {
-                                print_q($q2_results, $no_exit_more_than_one_driver, $drivers, 2);
-                            }
-
-                            if (count($q3_results) > 0) {
-                                print_q($q3_results, $no_exit_more_than_one_driver, $drivers, 3);
-                            }
-
-                            if (count($q4_results) > 0) {
-                                print_q($q4_results, $no_exit_more_than_one_driver, $drivers, 4);
+                            if (count($q2_results) == 0 && count($q3_results) == 0 && count($q4_results) == 0) {
+                                print_q($q1_results, $no_exit_more_than_one_driver, $drivers, '');
+                            } else {
+                                if (count($q4_results) > 0) {
+                                    print_q($q4_results, $no_exit_more_than_one_driver, $drivers, 'Q4');
+                                }
+                                if (count($q3_results) > 0) {
+                                    print_q($q3_results, $no_exit_more_than_one_driver, $drivers, 'Q3');
+                                }
+                                if (count($q2_results) > 0) {
+                                    print_q($q2_results, $no_exit_more_than_one_driver, $drivers, 'Q2');
+                                }
+                                if (count($q1_results) > 0) {
+                                    print_q($q1_results, $no_exit_more_than_one_driver, $drivers, 'Q1');
+                                }
                             }
                             ?>
 
-                            <div class="tb-row header">
-                                <div style="width: 100%;">Not classified</div>
-                            </div>
-
-                            <?php if (count($nc_results) > 0) {
-                                // output data of each row
-                                foreach ($nc_results as $row) {
+                            <?php if (count($nc_results) > 0) { ?>
+                                <div class="tb-row header">
+                                    <div style="width: 100%;">Not classified</div>
+                                </div>
+                            <?php foreach ($nc_results as $row) {
                                     echo "<div class='tb-row'>
 										<div class='wrapper pos-nr-cl'><div class='column pos'><span class='circled'>" . $row["pos"] . "</span></div><div class='column nr'><span class='number'>" . $row["number"] . "</span></div></div>
 										<div class='wrapper driver-nat'>
@@ -266,8 +266,6 @@ function print_q($results, $no_exit_more_than_one_driver, $drivers, $index)
 										<div class='wrapper laps-time-best-gd'><div class='" . ($no_exit_more_than_one_driver_nc ? 'wrapper no-one-more-driver' : 'wrapper laps-time') . "'><div class='column laps'>" . $row["laps"] . "</div><div class='column time'>" . $row["time"] . "</div></div><div class='" . ($no_exit_more_than_one_driver_nc ? 'wrapper no-one-more-driver' : 'wrapper laps-time') . "'><div class='column gd'>" . $row["gap"] . "</div></div></div>
 									  </div>";
                                 }
-                            } else {
-                                echo "<p style='padding: 5px;'>All entries were classified in the race.</p>";
                             }
 
                             mysqli_close($conn);
