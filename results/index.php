@@ -146,6 +146,7 @@ while ($row = mysqli_fetch_assoc($footer_query_result)) {
 
 ?>
 
+<!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml">
 
 <head>
@@ -180,11 +181,62 @@ while ($row = mysqli_fetch_assoc($footer_query_result)) {
     .custom-sidebar {
         box-shadow: 10px 8px 10px #f2f2f2;
     }
+	
+	.dates {
+		font-style: italic;
+		font-size: 11px;
+	}
+	.round-date {
+		margin-bottom: 5px;
+	}
+	.qualifying {
+		margin-bottom: 5px;
+	}
+	.qual a{
+		font-weight: bold;
+		color: #000;
+	}
+	.qual a:hover{
+		text-decoration: underline;
+		font-weight: bold;
+		color: #000;
+	}
+	.races {
+		margin-bottom: 2px;
+	}
+	.race a{
+	font-weight: bold;
+	color: #000;
+	}
+	.race a:hover{
+		text-decoration: underline;
+		font-weight: bold;
+		color: #000;
+	}
+	.footeryear {
+		border: 1px solid #e5e5e5;
+		border-radius: 5px;
+		padding: 3px;
+		line-height: 12px;
+		display: inline-block;
+		margin-bottom: 4px;
+		background: #F7F7F7;
+	}
+	.footeryear a {
+		color: #000000;
+	}
+	.footeryear:hover {
+		background: #E5E5E5;
+	}
+	.seriesgroup {
+		margin-bottom: 5px;
+		border-bottom: 1px dashed #E5E5E5;
+	}
 </style>
 
 <?php get_header(); ?>
 
-<div class="td-container">
+<div class="td-container-wrap" style="padding: 20px;">
     <div class="td-pb-row">
         <div class="td-pb-span12">
             <div class="td-post-header td-pb-padding-side">
@@ -195,9 +247,11 @@ while ($row = mysqli_fetch_assoc($footer_query_result)) {
                     <li class='entry-category'><a href='index.php'><?php echo $year; ?></a></li>
                 </ul>
 
-                <header>
-                    <h1 class='entry-title'><?php echo $year . ' ' . $series_title; ?> Results</h1>
-                </header>
+                <div class="td_block_wrap tdb_title tdi_78_07e tdb-single-title td-pb-border-top td_block_template_1" style="margin-bottom: 0px;">
+					<div class="tdb-block-inner td-fix-index">
+						<h1 class='tdb-title-text' style="font-family: Oxygen; font-size: 32px; font-weight: 800;"><?php echo $year . ' ' . $series_title; ?> Race Results</h1>
+					</div>
+				</div>
             </div>
         </div>
     </div>
@@ -234,37 +288,33 @@ while ($row = mysqli_fetch_assoc($footer_query_result)) {
 
                             <div class="custom-card">
                                 <img src="<?php $_SERVER['DOCUMENT_ROOT']; ?><?php echo $values[0][5]; ?>" title="<?php $values[0][2]; ?>" style="width: auto; height: auto;" />
-                                <p>
-                                    <b><?php echo $rounds; ?></b>
-                                    <br /><br />
-
-                                    <em>
+                                <p class="round-date">
+                                    <b><?php echo $rounds; ?></b>, 
+									<span class="dates">
                                         <?php
+										$formattedfrom = date('D M j', strtotime($from));
+										$formattedto = date('D M j', strtotime($to));
                                         if ($from == $to) {
-                                            echo $from;
+                                            echo $formattedfrom;
                                         } else {
-                                            echo $from . ' - ' . $to;
+                                            echo $formattedfrom . ' - ' . $formattedto;
                                         }
                                         ?>
-                                    </em>
-                                    <br /><br />
-
-                                    <a href='qual<?php echo $values[0][4]; ?>.php'>
-                                        Qualifying
-                                    </a>
-                                    <br />
-
-                                    <ul>
-                                        <?php
-                                        foreach ($values as $item) { ?>
-                                            <li>
-                                                <a href='rd<?php echo $item[3]; ?>.php'>
-                                                    Round <?php echo $item[0]; ?>
-                                                </a>
-                                            </li>
-                                        <?php }
-                                        ?>
-                                    </ul>
+                                    </span>
+								</p>
+								<p class="qualifying">
+										<span class="qual">
+											&raquo; <a href='qualifying.php?id=<?php echo $values[0][4]; ?>'>Qualifying</a>
+										</span>
+                                </p>
+								<p class="races">
+										<?php
+										foreach ($values as $item) { ?>
+												<span class="race" style="margin-bottom: 8px;">
+													&raquo; <a href='race.php?id=<?php echo $item[3]; ?>' style='line-height: 16px;'>Round <?php echo $item[0]; ?></a>
+												</span><br />
+										<?php }
+										?>
                                 </p>
                             </div>
                         </div>
@@ -453,19 +503,20 @@ while ($row = mysqli_fetch_assoc($footer_query_result)) {
         <div class="td-pb-span12">
             <div class="custom-footer">
                 <div class="block-title" style="margin-bottom: 0px;">
-                    <span>Browse results by person</span>
+                    <span>Browse results by season</span>
                 </div>
                 <div class="td-post-content" style="margin-top: 0px;">
                     <?php
                     $i = 0;
                     foreach ($footer_data as $key => $values) {
-                        echo "<b>" . $values[0][0] . ': &nbsp;&nbsp;</b>';
+                        echo "<div class='seriesgroup'><b>" . $values[0][0] . ': &nbsp;&nbsp;</b>';
                         $string = '';
+						echo "";
                         foreach ($values as $value) {
-                            $string .= "<a href='" . get_option('home') . "/database/standings.php?series=" . $key . "&year=" . $value[1] . "'>" . $value[1] . "</a>-";
+                            $string .= "<div class='footeryear'><a href='" . get_option('home') . "/database/index.php?series=" . $key . "&year=" . $value[1] . "'>" . $value[1] . "</a></div> ";
                         }
                         echo rtrim($string, "-");
-                        echo "<br>";
+                        echo "</div>";
                         $i++;
                     }
                     ?>
