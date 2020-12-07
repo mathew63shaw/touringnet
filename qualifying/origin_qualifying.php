@@ -9,7 +9,7 @@ mysqli_set_charset($conn, "utf8");
 $id = $_GET['id'];
 $id = mysqli_real_escape_string($conn, $id);
 
-$sql = "SELECT CASE WHEN CAST(qualifying.result AS UNSIGNED) = 0 THEN result ELSE CAST(qualifying.result AS UNSIGNED) END AS pos,qualifying.number, 
+$sql = "SELECT CASE WHEN CAST(qualifying.result AS UNSIGNED) = 0 THEN result ELSE CAST(qualifying.result AS UNSIGNED) END AS pos,qualifying.number, qualifying.`class`,
 qualifying.driver, qualifying.driver_id, qualifying.driver2, qualifying.driver_id2, qualifying.driver3, qualifying.driver_id3, qualifying.driver4, qualifying.driver_id4,
 drivers.image AS img, qualifying.entrant, qualifying.car, qualifying.laps, qualifying.time, qualifying.gap, qualifying.`qseg`, qualifying.id, qualifying.`date`
 FROM `drivers` 
@@ -18,7 +18,7 @@ ON drivers.id = qualifying.driver_id
 WHERE qualifying.qual_id = {$id} AND qualifying.result > 0
 ORDER BY id, pos ASC";
 
-$sqlnc = "SELECT CASE WHEN CAST(qualifying.result AS UNSIGNED) = 0 THEN result ELSE CAST(qualifying.result AS UNSIGNED) END AS pos,qualifying.number, 
+$sqlnc = "SELECT CASE WHEN CAST(qualifying.result AS UNSIGNED) = 0 THEN result ELSE CAST(qualifying.result AS UNSIGNED) END AS pos,qualifying.number, qualifying.`class`,
 qualifying.driver, qualifying.driver_id, qualifying.driver2, qualifying.driver_id2, qualifying.driver3, qualifying.driver_id3, qualifying.driver4, qualifying.driver_id4,
 drivers.image AS img, qualifying.entrant, qualifying.car, qualifying.laps, qualifying.time, qualifying.gap, qualifying.id
 FROM `drivers` 
@@ -118,6 +118,7 @@ function print_q($results, $no_exit_more_than_one_driver, $drivers, $title)
             <div class="tb-row header"><div class="wrapper pos-nr-cl">
                 <div class="column pos"><span class="circled">P</span></div>
                     <div class="column nr"><span class="number">NO</span></div>
+                    <div class="column cl">Cl</div>
                 </div>
                 <div class="wrapper driver-nat">
                     <div class="column driver">
@@ -144,7 +145,7 @@ function print_q($results, $no_exit_more_than_one_driver, $drivers, $title)
 
     foreach ($results as $row) {
         $html .= "<div class='tb-row'>
-            <div class='wrapper pos-nr-cl'><div class='column pos'><span class='circled'>" . $row["pos"] . "</span></div><div class='column nr'><span class='number'>" . $row["number"] . "</span></div></div>
+            <div class='wrapper pos-nr-cl'><div class='column pos'><span class='circled'>" . $row["pos"] . "</span></div><div class='column nr'><span class='number'>" . $row["number"] . "</span></div><div class='column cl'>" . (($row["class"] == 'M' or $row["class"] == 'I') ? '<span class="spanclass">' : "") . $row["class"] . (($row["class"] == 'M' or $row["class"] == 'I') ? '</span>' : "") . "</div></div>
             <div class='wrapper driver-nat'>
                 <div class='column driver'>
                     <div class='inline-driver-nat'>
@@ -238,7 +239,7 @@ function print_q($results, $no_exit_more_than_one_driver, $drivers, $title)
                                 </div>
                             <?php foreach ($nc_results as $row) {
                                     echo "<div class='tb-row'>
-										<div class='wrapper pos-nr-cl'><div class='column pos'><span class='circled'>" . $row["pos"] . "</span></div><div class='column nr'><span class='number'>" . $row["number"] . "</span></div></div>
+										<div class='wrapper pos-nr-cl'><div class='column pos'><span class='circled'>" . $row["pos"] . "</span></div><div class='column nr'><span class='number'>" . $row["number"] . "</span></div><div class='column cl'>" . (($row["class"] == 'M' or $row["class"] == 'I') ? '<span class="spanclass">' : "") . $row["class"] . (($row["class"] == 'M' or $row["class"] == 'I') ? '</span>' : "") . "</div></div>
 										<div class='wrapper driver-nat'>
 											<div class='column driver'>
 												<div class='inline-driver-nat'>
