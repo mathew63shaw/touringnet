@@ -315,11 +315,14 @@ while ($row = mysqli_fetch_assoc($footer_query_result)) {
                                 </p>
                                 <p class="qualifying">
                                     <?php
-                                    foreach ($values as $item) { ?>
-                                        <span class="qual">
-                                            &raquo; <a href='qualifying.php?id=<?php echo $item[4]; ?>' style='line-height: 16px;'>Qualifying Round <?php echo $item[0]; ?></a>
-                                        </span><br />
+                                    foreach ($values as $item) {
+                                        if ($first != $item[4]) {
+                                            $first = $item[4]; ?>
+                                            <span class="qual">
+                                                &raquo; <a href='qualifying.php?id=<?php echo $item[4]; ?>' style='line-height: 16px;'>Qualifying Round <?php echo $item[0]; ?></a>
+                                            </span><br />
                                     <?php }
+                                    }
                                     ?>
                                 </p>
                                 <p class="races">
