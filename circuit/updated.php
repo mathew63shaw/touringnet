@@ -1,7 +1,11 @@
-<?php require('../../../wp-blog-header.php'); ?>
-
 <?php
-require_once '../toplists/connection.php';
+define('WP_USE_THEMES', false);
+require($_SERVER['DOCUMENT_ROOT'] . '/wp-load.php');
+
+$servername = "localhost:3306";
+$username = "tcn_results";
+$password = "BtccWtcr2020!";
+$dbname = "tcn_results";
 
 // Create connection
 $conn = mysqli_connect($servername, $username, $password, $dbname);
@@ -45,7 +49,7 @@ $result5 = mysqli_query($conn, $sql5);
 <meta http-equiv="Content-Type" content="<?php bloginfo('html_type'); ?>; charset=<?php bloginfo('charset'); ?>" />
 <title><?php bloginfo('name'); ?> &raquo; Database &raquo; <?php echo $id ?> Race Winners</title>
 
-<link rel="stylesheet/less" type="text/css" href="flex.less" />
+<link rel="stylesheet/less" type="text/css" href="circuit.less" />
 <script src="//cdnjs.cloudflare.com/ajax/libs/less.js/3.0.0/less.min.js" ></script>
 
 <style type="text/css">
