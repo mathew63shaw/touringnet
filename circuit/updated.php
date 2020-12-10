@@ -26,11 +26,11 @@ races.entrant AS team, races.car AS vehicle, races.time AS duration, races.date 
 FROM circuits 
 LEFT JOIN races 
 ON circuits.configuration = races.track 
-WHERE circuit = 'Silverstone' AND CASE WHEN races.series=\"BTCC\" and races.year=\"2001\" and races.class_pos=\"1\" and races.class=\"\" then Class_Pos=\"1\" else Result=\"1\" and Class!=\"P\" end order by 18, 4 asc";
+WHERE circuit = '{$id}' AND CASE WHEN races.series=\"BTCC\" and races.year=\"2001\" and races.class_pos=\"1\" and races.class=\"\" then Class_Pos=\"1\" else Result=\"1\" and Class!=\"P\" end order by 18, 4 asc";
 
 $sql2 = "select circuits.circuit, date_format(min(date),'%D %b %Y') as mindate, date_format(max(date),'%D %b %Y') as maxdate from circuits LEFT JOIN races on circuits.configuration = races.track WHERE circuit = '" . $id . "' and Result = '1'";
 
-$sql3 = "select circuit, layout, configuration, from_year, to_year, graphic_path, excerpt from circuits WHERE circuit = '" . $id . "' order by 2, 4 asc";
+$sql3 = "select circuit, layout, configuration, from_year, to_year, graphic_path, excerpt, variant from circuits WHERE circuit = '" . $id . "' order by 2, 4 asc";
 
 // This is along the right lines but doesn't work due to the structure of circuits and qualifying - it ends up tripling certain rows based on duplicate circuit configurations. "SELECT circuits.circuit, qualifying.track as trck, qualifying.series as cship, qualifying.year as yr, qualifying.round as rd, qualifying.result as res, qualifying.driver as pilot, qualifying.entrant as team, qualifying.car as vehicle, qualifying.time as duration From circuits LEFT JOIN qualifying on circuits.configuration = qualifying.track Where `track` = '" .$id. "' and `TopQ` = 'Y' and `Result` = '1' order by 4, 3, 5 asc limit 100"
 
@@ -57,11 +57,11 @@ if (mysqli_num_rows($result3) > 0) {
 }
 
 // Drivers data
-$sqldrivers = "SELECT id, image AS img FROM drivers ORDER BY id";
+$sqldrivers = "SELECT id, driver FROM drivers ORDER BY id";
 $drivers_result = mysqli_query($conn, $sqldrivers);
 $drivers = [];
 while ($row = mysqli_fetch_assoc($drivers_result)) {
-	$drivers[$row['id']] = $row['img'];
+	$drivers[$row['id']] = $row['driver'];
 }
 
 
@@ -134,7 +134,7 @@ $result5 = mysqli_query($conn, $sql5);
 
                     function print_headers($this_row)
                     {
-                        echo "<div class='tab'>\n"; // will depend on $this_row
+                        echo "<div class='tab'><div class='tb-row header'>".$this_row['variant']."</div>\n"; // will depend on $this_row
                     }
 
                     function print_footers($this_row)
@@ -161,7 +161,7 @@ $result5 = mysqli_query($conn, $sql5);
 
                         </div>
 
-                        <div style="display: inline-block; padding: 10px; overflow: scroll">
+                        <div style="display: inline-block; padding: 10px;">
 
                             <?php if (mysqli_num_rows($result5) > 0) {
                                 while ($row = mysqli_fetch_assoc($result5)) { ?>
@@ -239,16 +239,16 @@ $result5 = mysqli_query($conn, $sql5);
                                                     <div class='text-layout'>
                                                         <span>" . $row["trvar"] . "</span>
                                                     </div>
-                                                    <div class='text-driver' title='" . $row["pilot"] . "'>
-                                                        <a href='driver-wins.php?series=" . $row["cship"] . "&driver=" . $row["pilot"] . "'><span>" . mb_strimwidth($row["pilot"], 0, 20, "..") . "</span></a>"
+                                                    <div class='text-driver'>
+                                                        <a href='driver-wins.php?series=" . $row["cship"] . "&driver=" . $row["pilot"] . "' title='" . $row["pilot"] . "'><span>" . mb_strimwidth($row["pilot"], 0, 20, "..") . "</span></a>"
                                                         . ($row["driver2"] ?
-                                                            "<a href='driver-wins.php?series=" . $row["cship"] . "&driver=" . $drivers[$row['driver_id2']] . "'><span>" . mb_strimwidth($row["pilot"], 0, 20, "..") . "</span></a>"
+                                                            "<br><a href='driver-wins.php?series=" . $row["cship"] . "&driver=" . $drivers[$row['driver_id2']] . "' title='" . $drivers[$row['driver_id2']] . "'><span>" . mb_strimwidth($drivers[$row['driver_id2']], 0, 20, "..") . "</span></a>"
                                                             : "")
                                                         . ($row["driver3"] ?
-                                                            "<a href='driver-wins.php?series=" . $row["cship"] . "&driver=" . $drivers[$row['driver_id3']] . "'><span>" . mb_strimwidth($row["pilot"], 0, 20, "..") . "</span></a>"
+                                                            "<br><a href='driver-wins.php?series=" . $row["cship"] . "&driver=" . $drivers[$row['driver_id3']] . "' title='" . $drivers[$row['driver_id3']] . "'><span>" . mb_strimwidth($drivers[$row['driver_id3']], 0, 20, "..") . "</span></a>"
                                                             : "")
                                                         . ($row["driver4"] ?
-                                                            "<a href='driver-wins.php?series=" . $row["cship"] . "&driver=" . $drivers[$row['driver_id4']] . "'><span>" . mb_strimwidth($row["pilot"], 0, 20, "..") . "</span></a>"
+                                                            "<br><a href='driver-wins.php?series=" . $row["cship"] . "&driver=" . $drivers[$row['driver_id4']] . "' title='" . $drivers[$row['driver_id4']] . "'><span>" . mb_strimwidth($drivers[$row['driver_id4']], 0, 20, "..") . "</span></a>"
                                                             : "").
                                                     "</div>
                                                 </div>
