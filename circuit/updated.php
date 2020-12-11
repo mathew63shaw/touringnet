@@ -232,7 +232,7 @@ $result5 = mysqli_query($conn, $sql5);
                                                 </div>
                                             </div>
                                             <div class='wrapper text-2'>
-                                                <div class='wrapper text-2' style='align-items: center;'>
+                                                <div class='wrapper text-2 rd-layt-driv'>
                                                     <div class='text-round'>
                                                         <a href='race.php?id=".$row['race_id']."'><span>".$row['rd']."</span><a>
                                                     </div>
