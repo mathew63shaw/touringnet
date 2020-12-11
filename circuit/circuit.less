@@ -12,58 +12,133 @@ Taken from https://codepen.io/vasansr/pen/jWazPM
 see also https://hashnode.com/post/really-responsive-tables-using-css3-flexbox-cijzbxd8n00pwvm53sl4l42cx
 
 */
+/*
+   * General good-look styles, not mandatory.
+   */
+   body {
+    font-size: 13px;
+}
 
+.tb-row {
+    border-bottom: 1px dashed #000000;
+    border-collapse: collapse;
+    padding-top: 5px;
+    align-items: center;
+}
+
+.tb-row.header {
+    background-color: #E5E5E5;
+    font-weight: normal;
+    padding-top: 8px;
+    padding-bottom: 8px;
+}
+
+
+.h4h {
+    margin-left: 10px;
+}
+
+.tb-row:nth-of-type(even) {
+    background-color: #f7f7f7;
+}
+
+.tb-row:hover {
+    background-color: #d1d5ff;
+}
+
+/* Style the tab */
+.tab {
+    overflow: hidden;
+    border: 1px solid #ccc;
+    background-color: #f1f1f1;
+}
+
+/* Style the buttons that are used to open the tab content */
+.tab button {
+    background-color: inherit;
+    float: left;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    padding: 14px 16px;
+    transition: 0.3s;
+}
+
+/* Change background color of buttons on hover */
+.tab button:hover {
+    background-color: #ddd;
+}
+
+/* Create an active/current tablink class */
+.tab button.active {
+    background-color: #ccc;
+}
+
+/* Style the tab content */
+.tabcontent {
+    display: none;
+    padding: 6px 12px;
+    border-top: none;
+}
+
+.rd-layt-driv {
+    align-items: center;
+}
+
+.collapsible-content {
+    display: block;
+}
 
 
 .tb-row {
-  display: flex;
-  display: -webkit-flex;
-  flex-direction: row;
-  -webkit-flex-direction: row;
-  flex-wrap: no-wrap;
-  -webkit-flex-wrap: no-wrap;
-  width: 100%;
-  padding-left: 15px;
-  padding-right: 15px;
+    display: flex;
+    display: -webkit-flex;
+    flex-direction: row;
+    -webkit-flex-direction: row;
+    flex-wrap: no-wrap;
+    -webkit-flex-wrap: no-wrap;
+    width: 100%;
+    padding-left: 15px;
+    padding-right: 15px;
 }
 
 .wrapper {
-  display: flex;
-  display: -webkit-flex;
-  flex-direction: row;
-  -webkit-flex-direction: row;
-  flex-grow: 0;
-  -webkit-flex-grow: 0;
+    display: flex;
+    display: -webkit-flex;
+    flex-direction: row;
+    -webkit-flex-direction: row;
+    flex-grow: 0;
+    -webkit-flex-grow: 0;
 }
 
 .text-4,
 .text-2,
 .text {
-  flex-grow: 1;
-  -webkit-flex-grow: 1;
+    flex-grow: 1;
+    -webkit-flex-grow: 1;
 }
 
 .text {
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  padding-right: 20px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    padding-right: 20px;
 }
 
 .text {
-  width: 100px;
+    width: 100px;
 }
 
 .text-series {
-  width: 55px;
+    width: 55px;
 }
 
 .text-year {
-  width: 55px;
+    width: 55px;
 }
 
 .text-layout {
-  width: 110px;
+    width: 110px;
 }
 
 // .text-driver {
@@ -71,183 +146,118 @@ see also https://hashnode.com/post/really-responsive-tables-using-css3-flexbox-c
 // }
 
 .text-driver {
-  width: 145px;
+    width: 145px;
 }
 
 .text-round {
-  width: 60px;
+    width: 60px;
 }
 
 .text-entrant {
-  width: 265px;
+    width: 265px;
 }
 
 .text-car {
-  width: 220px;
+    width: 220px;
 }
 
 .text-time {
-  width: 60px;
+    width: 60px;
 }
 
 .num {
-  width: 80px;
-  text-align: right;
+    width: 80px;
+    text-align: right;
 }
 
 /*
- * Media queries: optimize for different screen widths.
- */
+   * Media queries: optimize for different screen widths.
+   */
 @media all and (max-width: 1100px) {
-  .rd-layt-driv {
-      align-items: center !important;
-  }
+    .rd-layt-driv {
+        align-items: center !important;
+    }
 
-  .text-2,
-  .text-4,
-  .num-2 {
-      flex-direction: column;
-      -webkit-flex-direction: column;
-  }
+    .text-2,
+    .text-4,
+    .num-2 {
+        flex-direction: column;
+        -webkit-flex-direction: column;
+    }
 
-  .text-2 div,
-  .text-4 div,
-  .num-2 div {
-      flex-grow: 0;
-      -webkit-flex-grow: 0;
-      width: 100%;
-  }
+    .text-2 div,
+    .text-4 div,
+    .num-2 div {
+        flex-grow: 0;
+        -webkit-flex-grow: 0;
+        width: 100%;
+    }
 
-  .text-2 {
-      width: 110px;
-  }
+    .text-2 {
+        width: 110px;
+    }
 
-  .text-4 {
-      width: 85px;
-  }
+    .text-4 {
+        width: 85px;
+    }
 
-  .num-2 {
-      width: 80px;
-  }
+    .num-2 {
+        width: 80px;
+    }
 }
 
 @media all and (max-width: 580px) {
-  .rd-layt-driv {
-      align-items: flex-start !important;
-  }
+    .rd-layt-driv {
+        align-items: flex-start !important;
+    }
 
-  .text-4,
-  .num-4 {
-      flex-direction: column;
-      -webkit-flex-direction: column;
-  }
+    .collapsible-content {
+        display: none;
+    }
 
-  .text-4 div,
-  .num-4 div {
-      flex-grow: 0;
-      -webkit-flex-grow: 0;
-      width: 100%;
-  }
+    .text-4,
+    .num-4 {
+        flex-direction: column;
+        -webkit-flex-direction: column;
+    }
 
-  .text-4 {
-      width: 85px;
-  }
+    .text-4 div,
+    .num-4 div {
+        flex-grow: 0;
+        -webkit-flex-grow: 0;
+        width: 100%;
+    }
 
-  .num-4 {
-      width: 80px;
-  }
+    .text-4 {
+        width: 85px;
+    }
+
+    .num-4 {
+        width: 80px;
+    }
 }
 
 @media all and (max-width: 320px) {
-  .rd-layt-driv {
-      align-items: flex-start !important;
-  }
+    .rd-layt-driv {
+        align-items: flex-start !important;
+    }
 
-  .tb-row {
-      flex-direction: column;
-      -webkit-flex-direction: column;
-  }
+    .collapsible-content {
+        display: none;
+    }
 
-  .tb-row div {
-      flex-grow: 0;
-      -webkit-flex-grow: 0;
-      width: 100%;
-  }
+    .tb-row {
+        flex-direction: column;
+        -webkit-flex-direction: column;
+    }
 
-  .num {
-      text-align: left;
-  }
-}
+    .tb-row div {
+        flex-grow: 0;
+        -webkit-flex-grow: 0;
+        width: 100%;
+    }
 
-/*
- * General good-look styles, not mandatory.
- */
-body {
-  font-size: 13px;
-}
-
-.tb-row {
-  border-bottom: 1px dashed #000000;
-  border-collapse: collapse;
-  padding-top: 5px;
-  align-items: center;
-}
-
-.tb-row.header {
-  background-color: #E5E5E5;
-  font-weight: normal;
-  padding-top: 8px;
-  padding-bottom: 8px;
-}
-
-
-.h4h {
-  margin-left: 10px;
-}
-
-.tb-row:nth-of-type(even) {
-  background-color: #f7f7f7;
-}
-
-.tb-row:hover {
-  background-color: #d1d5ff;
-}
-
-/* Style the tab */
-.tab {
-  overflow: hidden;
-  border: 1px solid #ccc;
-  background-color: #f1f1f1;
-}
-
-/* Style the buttons that are used to open the tab content */
-.tab button {
-  background-color: inherit;
-  float: left;
-  border: none;
-  outline: none;
-  cursor: pointer;
-  padding: 14px 16px;
-  transition: 0.3s;
-}
-
-/* Change background color of buttons on hover */
-.tab button:hover {
-  background-color: #ddd;
-}
-
-/* Create an active/current tablink class */
-.tab button.active {
-  background-color: #ccc;
-}
-
-/* Style the tab content */
-.tabcontent {
-  display: none;
-  padding: 6px 12px;
-  border-top: none;
-}
-
-.rd-layt-driv {
-  align-items: center;
+    .num {
+        text-align: left;
+    }
 }

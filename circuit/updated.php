@@ -41,7 +41,7 @@ $sql5 = $sql3;
 $result = mysqli_query($conn, $sql);
 $winners_of_races = [];
 while ($row = mysqli_fetch_assoc($result)) {
-	$winners_of_races[] = $row;
+    $winners_of_races[] = $row;
 }
 
 $result2 = mysqli_query($conn, $sql2);
@@ -61,7 +61,7 @@ $sqldrivers = "SELECT id, driver FROM drivers ORDER BY id";
 $drivers_result = mysqli_query($conn, $sqldrivers);
 $drivers = [];
 while ($row = mysqli_fetch_assoc($drivers_result)) {
-	$drivers[$row['id']] = $row['driver'];
+    $drivers[$row['id']] = $row['driver'];
 }
 
 
@@ -134,12 +134,12 @@ $result5 = mysqli_query($conn, $sql5);
 
                     function print_headers($this_row)
                     {
-                        echo "<div class='tab'><div class='tb-row header'>".$this_row['variant']."</div>\n"; // will depend on $this_row
+                        echo "<div class='tab'><div class='tb-row header collapsible'>" . $this_row['variant'] . "</div><div class='collapsible-content'>\n"; // will depend on $this_row
                     }
 
                     function print_footers($this_row)
                     {
-                        echo "</div><!-- Close tab div -->"; // will depend on $this_row
+                        echo "</div></div><!-- Close tab div -->"; // will depend on $this_row
                     }
                     ?>
 
@@ -223,9 +223,9 @@ $result5 = mysqli_query($conn, $sql5);
                                     echo "<div class='tb-row'>
                                             <div class='wrapper text-2'>
                                                 <div class='wrapper text-2'>
-                                                    <div class='text-series' title='" . $row["cship"] . "'>" 
-                                                        . (($row["cship"] == 'TCR Asia') ? '<span>TCR AS</span>' : (($row["cship"] == 'STW Cup') ? '<span>STW</span>' : (($row["cship"] == 'ETC Cup') ? '<span>ETC</span>' : '<span>' . $row["cship"] . '</span>'))) . 
-                                                    "</div>
+                                                    <div class='text-series' title='" . $row["cship"] . "'>"
+                                        . (($row["cship"] == 'TCR Asia') ? '<span>TCR AS</span>' : (($row["cship"] == 'STW Cup') ? '<span>STW</span>' : (($row["cship"] == 'ETC Cup') ? '<span>ETC</span>' : '<span>' . $row["cship"] . '</span>'))) .
+                                        "</div>
                                                     <div class='text-year'>
                                                         <span>" . $row["yr"] . "</span>
                                                     </div>
@@ -234,23 +234,23 @@ $result5 = mysqli_query($conn, $sql5);
                                             <div class='wrapper text-2'>
                                                 <div class='wrapper text-2 rd-layt-driv'>
                                                     <div class='text-round'>
-                                                        <a href='race.php?id=".$row['race_id']."'><span>".$row['rd']."</span><a>
+                                                        <a href='race.php?id=" . $row['race_id'] . "'><span>" . $row['rd'] . "</span><a>
                                                     </div>
                                                     <div class='text-layout'>
                                                         <span>" . $row["trvar"] . "</span>
                                                     </div>
                                                     <div class='text-driver'>
                                                         <a href='driver-wins.php?series=" . $row["cship"] . "&driver=" . $row["pilot"] . "' title='" . $row["pilot"] . "'><span>" . mb_strimwidth($row["pilot"], 0, 20, "..") . "</span></a>"
-                                                        . ($row["driver2"] ?
-                                                            "<br><a href='driver-wins.php?series=" . $row["cship"] . "&driver=" . $drivers[$row['driver_id2']] . "' title='" . $drivers[$row['driver_id2']] . "'><span>" . mb_strimwidth($drivers[$row['driver_id2']], 0, 20, "..") . "</span></a>"
-                                                            : "")
-                                                        . ($row["driver3"] ?
-                                                            "<br><a href='driver-wins.php?series=" . $row["cship"] . "&driver=" . $drivers[$row['driver_id3']] . "' title='" . $drivers[$row['driver_id3']] . "'><span>" . mb_strimwidth($drivers[$row['driver_id3']], 0, 20, "..") . "</span></a>"
-                                                            : "")
-                                                        . ($row["driver4"] ?
-                                                            "<br><a href='driver-wins.php?series=" . $row["cship"] . "&driver=" . $drivers[$row['driver_id4']] . "' title='" . $drivers[$row['driver_id4']] . "'><span>" . mb_strimwidth($drivers[$row['driver_id4']], 0, 20, "..") . "</span></a>"
-                                                            : "").
-                                                    "</div>
+                                        . ($row["driver2"] ?
+                                            "<br><a href='driver-wins.php?series=" . $row["cship"] . "&driver=" . $drivers[$row['driver_id2']] . "' title='" . $drivers[$row['driver_id2']] . "'><span>" . mb_strimwidth($drivers[$row['driver_id2']], 0, 20, "..") . "</span></a>"
+                                            : "")
+                                        . ($row["driver3"] ?
+                                            "<br><a href='driver-wins.php?series=" . $row["cship"] . "&driver=" . $drivers[$row['driver_id3']] . "' title='" . $drivers[$row['driver_id3']] . "'><span>" . mb_strimwidth($drivers[$row['driver_id3']], 0, 20, "..") . "</span></a>"
+                                            : "")
+                                        . ($row["driver4"] ?
+                                            "<br><a href='driver-wins.php?series=" . $row["cship"] . "&driver=" . $drivers[$row['driver_id4']] . "' title='" . $drivers[$row['driver_id4']] . "'><span>" . mb_strimwidth($drivers[$row['driver_id4']], 0, 20, "..") . "</span></a>"
+                                            : "") .
+                                        "</div>
                                                 </div>
                                             </div>
                                             <div class='wrapper text-2'>
@@ -299,6 +299,26 @@ $result5 = mysqli_query($conn, $sql5);
             var initial_circuit_graphic = '<?php echo $initial_circuit_graphic; ?>';
             openCircuit(event, initial_circuit_graphic);
         })();
+
+
+        // Collapsible circuit year
+        var coll = document.getElementsByClassName("collapsible");
+        for (var i = 0; i < coll.length; i++) {
+            coll[i].addEventListener("click", function() {
+                // console.log('clicked>>>', window.innerWidth);
+                if (window.innerWidth < 580) {
+                    // console.log('mobile!!!')
+                    this.classList.toggle("active");
+                    var content = this.nextElementSibling;
+                    if (content.style.display === "block") {
+                        content.style.display = "none";
+                    } else {
+                        content.style.display = "block";
+                    }
+                }
+            });
+        }
+
 
         function openCircuit(evt, cityName) {
             // Declare all variables
